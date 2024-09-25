@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import Map, {Source, Layer} from 'react-map-gl/maplibre';
-import type {CircleLayer} from 'react-map-gl/maplibre';
+import type {SymbolLayer, CircleLayer} from 'react-map-gl/maplibre';
 import type {FeatureCollection} from 'geojson';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import Sidebar from './Sidebar';
@@ -22,7 +22,24 @@ function createPointFeature(city: City): Feature<Point, GeoJsonProperties> {
 }
 
 
-const layerStyle: CircleLayer = {
+const layerStyle: SymbolLayer = {
+  id: 'labels',
+  type: 'symbol',
+  source: 'circle',
+  layout: {
+    'text-field': ['get', 'name'],
+    'text-variable-anchor': ['top', 'bottom', 'left', 'right'],
+    'text-radial-offset': 1,
+    'text-justify': 'auto',
+  },
+  paint: {
+    'text-color': '#000000',
+    'text-halo-color': '#ffffff',
+    'text-halo-width': 1,
+  }
+};
+
+const pointsStyle: CircleLayer = {
   id: 'point',
   type: 'circle',
   source: 'circle',
@@ -31,6 +48,9 @@ const layerStyle: CircleLayer = {
     'circle-color': '#007cbfd0'
   }
 };
+
+
+
 interface MapComponentProps {
   cities: City[];
 }
@@ -55,8 +75,11 @@ const MapContainer: React.FC<MapComponentProps> = ({cities}) => {
       mapStyle="https://demotiles.maplibre.org/style.json"
       style={{width: "100vw", height: "100vh"}}
     >
-      <Source id="circle" type="geojson" data={geojson}>
+      <Source id="labels" type="geojson" data={geojson}>
         <Layer {...layerStyle} />
+      </Source>
+      <Source id="circle" type="geojson" data={geojson}>
+        <Layer {...pointsStyle} />
       </Source>
     </Map>
   );

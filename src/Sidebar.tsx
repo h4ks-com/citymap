@@ -28,7 +28,7 @@ const Sidebar: React.FC<SidebarProps> = ({cities, onAddCity, onRemoveCity}) => {
       if (response.data.length > 0) {
         const cityData = response.data[0];
         const newCity: City = {
-          name: cityData.display_name,
+          name: cityData.display_name.split(',')[0],
           lat: parseFloat(cityData.lat),
           lon: parseFloat(cityData.lon),
         };
