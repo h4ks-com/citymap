@@ -1,6 +1,11 @@
-# Getting Started with Create React App
+# Citymaps
+```
+<handyc> do you know of any type of simple tool that lets someone input a list of city names,
+<handyc> and it outputs a map of Earth with those places plotted
+<handyc> nothing fancy, just exactly what I said
+```
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Yes.
 
 ## Available Scripts
 
