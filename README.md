@@ -1,4 +1,4 @@
-# Citymaps
+# Citypoints
 ```
 <handyc> do you know of any type of simple tool that lets someone input a list of city names,
 <handyc> and it outputs a map of Earth with those places plotted
