@@ -44,7 +44,7 @@ const pointsStyle: CircleLayer = {
   type: 'circle',
   source: 'circle',
   paint: {
-    'circle-radius': 15,
+    'circle-radius': 12,
     'circle-color': '#007cbfd0'
   }
 };
