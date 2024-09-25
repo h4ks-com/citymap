@@ -72,7 +72,7 @@ const MapContainer: React.FC<MapComponentProps> = ({cities}) => {
         latitude: 0,
         zoom: 1,
       }}
-      mapStyle="https://demotiles.maplibre.org/style.json"
+      mapStyle="/style.json"
       style={{width: "100vw", height: "100vh"}}
     >
       <Source id="labels" type="geojson" data={geojson}>

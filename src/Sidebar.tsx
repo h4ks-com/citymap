@@ -34,10 +34,11 @@ const Sidebar: React.FC<SidebarProps> = ({cities, onAddCity, onRemoveCity}) => {
         };
 
         onAddCity(newCity);
-        setCityInput('');
       } else {
         alert('City not found!');
       }
+        setCityInput('');
+
     } catch (error) {
       console.error('Error fetching city data', error);
     }
