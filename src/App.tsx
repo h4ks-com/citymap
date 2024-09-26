@@ -72,7 +72,7 @@ const MapContainer: React.FC<MapComponentProps> = ({cities}) => {
         latitude: 0,
         zoom: 1,
       }}
-      mapStyle="/style.json"
+      mapStyle=process.env.PUBLIC_URL + "/style.json"
       style={{width: "100vw", height: "100vh"}}
     >
       <Source id="labels" type="geojson" data={geojson}>
