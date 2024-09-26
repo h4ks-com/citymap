@@ -27,16 +27,17 @@ const layerStyle: SymbolLayer = {
   type: 'symbol',
   source: 'circle',
   layout: {
+    'text-font': ["Times New Roman Bold"],
     'text-field': ['get', 'name'],
     'text-variable-anchor': ['top', 'bottom', 'left', 'right'],
     'text-radial-offset': 1,
     'text-justify': 'auto',
-    'text-size': 25,
+    'text-size': 20,
   },
   paint: {
     'text-color': '#000000',
     'text-halo-color': '#ffffff',
-    'text-halo-width': 4,
+    'text-halo-width': 2,
   }
 };
 
