@@ -31,12 +31,12 @@ const layerStyle: SymbolLayer = {
     'text-variable-anchor': ['top', 'bottom', 'left', 'right'],
     'text-radial-offset': 1,
     'text-justify': 'auto',
-    'text-padding': 2
+    'text-size': 25,
   },
   paint: {
     'text-color': '#000000',
     'text-halo-color': '#ffffff',
-    'text-halo-width': 2,
+    'text-halo-width': 4,
   }
 };
 
