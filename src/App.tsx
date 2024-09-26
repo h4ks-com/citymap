@@ -45,7 +45,7 @@ const pointsStyle: CircleLayer = {
   source: 'circle',
   paint: {
     'circle-radius': 12,
-    'circle-color': '#007cbfd0'
+    'circle-color': '#cc1236dd'
   }
 };
 
@@ -72,7 +72,7 @@ const MapContainer: React.FC<MapComponentProps> = ({cities}) => {
         latitude: 0,
         zoom: 1,
       }}
-      mapStyle=process.env.PUBLIC_URL + "/style.json"
+      mapStyle={`${process.env.PUBLIC_URL}/style.json`}
       style={{width: "100vw", height: "100vh"}}
     >
       <Source id="labels" type="geojson" data={geojson}>
