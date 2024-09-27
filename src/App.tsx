@@ -75,7 +75,7 @@ const MapContainer: React.FC<MapComponentProps> = ({cities}) => {
         zoom: 1,
       }}
       mapStyle={`${process.env.PUBLIC_URL}/style.json`}
-      style={{width: "100vw", height: "100vh"}}
+      style={{width: "80vw", height: "100vh"}}
     >
       <Source id="labels" type="geojson" data={geojson}>
         <Layer {...layerStyle} />
