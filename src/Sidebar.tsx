@@ -32,12 +32,11 @@ const Sidebar: React.FC<SidebarProps> = ({cities, onAddCity, onRemoveCity}) => {
           lat: parseFloat(cityData.lat),
           lon: parseFloat(cityData.lon),
         };
-
+        setCityInput('');
         onAddCity(newCity);
       } else {
         alert('City not found!');
       }
-        setCityInput('');
 
     } catch (error) {
       console.error('Error fetching city data', error);
