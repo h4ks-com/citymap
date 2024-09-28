@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import Map, {Source, Layer} from 'react-map-gl/maplibre';
 import type {SymbolLayer, CircleLayer} from 'react-map-gl/maplibre';
 import type {FeatureCollection} from 'geojson';
@@ -7,6 +7,7 @@ import Sidebar from './Sidebar';
 import {City} from './types';
 import './App.css';
 import {Point, Feature, GeoJsonProperties} from 'geojson';
+import useLocalStorage from './customHooks';
 
 function createPointFeature(city: City): Feature<Point, GeoJsonProperties> {
   return {
@@ -88,7 +89,7 @@ const MapContainer: React.FC<MapComponentProps> = ({cities}) => {
 }
 
 function App() {
-  const [cities, setCities] = useState<City[]>([]);
+  const [cities, setCities] = useLocalStorage<City[]>('cities', []);
 
   const handleAddCity = (newCity: City) => {
     setCities((prevCities) => [...prevCities, newCity]);
