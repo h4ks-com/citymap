@@ -43,6 +43,12 @@ const Sidebar: React.FC<SidebarProps> = ({cities, onAddCity, onRemoveCity}) => {
     }
   };
 
+  const handleKeyDown = (event: React.KeyboardEvent) => { 
+    if (event.key === "Enter") {
+      handleAddCity()
+    }
+  }
+
   return (
     <div className="sidebar">
       <h2>Cities</h2>
@@ -51,6 +57,7 @@ const Sidebar: React.FC<SidebarProps> = ({cities, onAddCity, onRemoveCity}) => {
         type="text"
         value={cityInput}
         onChange={(e) => setCityInput(e.target.value)}
+        onKeyDown={handleKeyDown}
         placeholder="Enter city name"
       />
       <button onClick={handleAddCity}>Add City</button>
