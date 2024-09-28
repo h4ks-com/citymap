@@ -3,16 +3,9 @@ import {IconButton, Box, Switch, Collapse, Typography, Paper, Tooltip} from '@mu
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import {LayerType} from './layers';
+import {FloatingMenuLayer} from './types';
 
 // Example layers array
-export interface FloatingMenuLayer {
-  type: string;
-  name: string;
-  description: string;
-  defaultToggled: boolean;
-  toggleable: boolean;
-}
-
 interface LayerMenuProps {
   layers: FloatingMenuLayer[];
   enabledLayers: string[];

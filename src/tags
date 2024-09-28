@@ -48,14 +48,41 @@
 .map-container	App.css	/^.map-container {$/;"	c
 .map-marker	App.css	/^.map-marker {$/;"	c
 .sidebar-container	App.css	/^.sidebar-container {$/;"	c
+AppLayer	layers.ts	/^export interface AppLayer extends FloatingMenuLayer {$/;"	i
 City	types.ts	/^export interface City {$/;"	i
+FloatingMenuLayer	types.ts	/^export interface FloatingMenuLayer {$/;"	i
+LayerType	layers.ts	/^export type LayerType = 'dots' | 'names' | 'time' | 'temperature';$/;"	a
+appLayers	layers.ts	/^const appLayers: AppLayer[] = [$/;"	C
+appLayers	layers.ts	/^export default appLayers;$/;"	C
 body	index.css	/^body {$/;"	s
 code	index.css	/^code {$/;"	s
+default	layers.ts	/^export default appLayers;$/;"	C
+defaultToggled	types.ts	/^  defaultToggled: boolean;$/;"	p	interface:FloatingMenuLayer
+description	types.ts	/^  description: string;$/;"	p	interface:FloatingMenuLayer
+dotsStyle	layers.ts	/^const dotsStyle: CircleLayer = {$/;"	C
+export	layers.ts	/^export default appLayers;$/;"	C
 lat	types.ts	/^  lat: number;$/;"	p	interface:City
 lon	types.ts	/^  lon: number;$/;"	p	interface:City
 name	types.ts	/^  name: string;$/;"	p	interface:City
+name	types.ts	/^  name: string;$/;"	p	interface:FloatingMenuLayer
+nameStyle	layers.ts	/^const nameStyle: SymbolLayer = {$/;"	C
 ns80309b940101	logo.svg	/^<svg xmlns="http:\/\/www.w3.org\/2000\/svg" viewBox="0 0 841.9 595.3"><g fill="#61DAFB"><path d=/;"	n	uri:http://www.w3.org/2000/svg
 reportWebVitals	reportWebVitals.ts	/^const reportWebVitals = (onPerfEntry?: ReportHandler) => {$/;"	C
 setValue	customHooks.ts	/^  const [value, setValue] = useState(() => {$/;"	C	function:useLocalStorage
+spec	layers.ts	/^    spec: dotsStyle,$/;"	C
+spec	layers.ts	/^    spec: nameStyle,$/;"	C
+spec	layers.ts	/^    spec: subtextStyle,$/;"	C
+spec	layers.ts	/^  spec: LayerSpecification;$/;"	p	interface:AppLayer
+subtextStyle	layers.ts	/^const subtextStyle: SymbolLayer = {$/;"	C
+temperature	types.ts	/^  temperature?: number;$/;"	p	interface:City
+time	types.ts	/^  time?: Date;$/;"	p	interface:City
+toggleable	layers.ts	/^    toggleable: false,$/;"	C
+toggleable	layers.ts	/^    toggleable: true,$/;"	C
+toggleable	types.ts	/^  toggleable: boolean;$/;"	p	interface:FloatingMenuLayer
+type	layers.ts	/^    type: 'names',$/;"	C
+type	layers.ts	/^    type: 'temperature',$/;"	C
+type	layers.ts	/^    type: 'time',$/;"	C
+type	layers.ts	/^  type: LayerType;$/;"	p	interface:AppLayer
+type	types.ts	/^  type: string;$/;"	p	interface:FloatingMenuLayer
 useLocalStorage	customHooks.ts	/^function useLocalStorage<T>(storageKey: string, fallbackState: T): [T, React.Dispatch<React.SetS/;"	f
 value	customHooks.ts	/^  const [value, setValue] = useState(() => {$/;"	C	function:useLocalStorage
