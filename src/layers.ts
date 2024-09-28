@@ -2,7 +2,10 @@ import {LayerSpecification} from "maplibre-gl";
 import {FloatingMenuLayer} from "./layersMenu";
 import {CircleLayer, SymbolLayer} from "react-map-gl/dist/esm/exports-maplibre";
 
-interface AppLayer extends FloatingMenuLayer {
+export type LayerType = 'dots' | 'names' | 'time' | 'temperature';
+
+export interface AppLayer extends FloatingMenuLayer {
+  type: LayerType;
   spec: LayerSpecification;
 }
 
@@ -36,9 +39,11 @@ const pointsStyle: CircleLayer = {
 };
 
 
-const layers: AppLayer[] = [
-  {type: 'dots', name: 'Markers', description: 'Red dots on the map', spec: pointsStyle},
-  {type: 'names', name: 'Names', description: 'Names of the city or region', spec: layerStyle},
+const appLayers: AppLayer[] = [
+  {type: 'dots', name: 'Markers', description: 'Red dots on the map', defaultToggled: true, spec: pointsStyle, toggleable: false},
+  {type: 'names', name: 'Names', description: 'Names of the city or region', defaultToggled: true, spec: layerStyle, toggleable: true},
+  {type: 'time', name: 'Local Time', description: 'Local time', defaultToggled: false, spec: layerStyle, toggleable: true},
+  {type: 'temperature', name: 'Temperature', description: 'Temperature in Celsius', defaultToggled: false, spec: layerStyle, toggleable: true},
 ]
 
-export default layers;
+export default appLayers;

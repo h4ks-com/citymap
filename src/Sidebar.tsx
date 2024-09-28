@@ -43,7 +43,7 @@ const Sidebar: React.FC<SidebarProps> = ({cities, onAddCity, onRemoveCity}) => {
     }
   };
 
-  const handleKeyDown = (event: React.KeyboardEvent) => { 
+  const handleKeyDown = (event: React.KeyboardEvent) => {
     if (event.key === "Enter") {
       handleAddCity()
     }

@@ -2,37 +2,47 @@ import React, {useState} from 'react';
 import {IconButton, Box, Switch, Collapse, Typography, Paper, Tooltip} from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import {LayerType} from './layers';
 
 // Example layers array
 export interface FloatingMenuLayer {
   type: string;
   name: string;
   description: string;
+  defaultToggled: boolean;
+  toggleable: boolean;
 }
 
 interface LayerMenuProps {
   layers: FloatingMenuLayer[];
-  onToggleLayer?: (layerName: string, visible: boolean) => void;
+  enabledLayers: string[];
+  onToggleEvent?: (enabledLayers: LayerType[]) => void;
 }
 
-const FloatingArrowMenu: React.FC<LayerMenuProps> = ({layers, onToggleLayer}) => {
+const FloatingArrowMenu: React.FC<LayerMenuProps> = ({layers, enabledLayers, onToggleEvent: onToggleLayer}) => {
   const [open, setOpen] = useState<boolean>(false);
 
-  // Initialize state with all switches set to false
+  // Initialize state with all switches
   const [switchStates, setSwitchStates] = useState<{[key: string]: boolean}>(
     layers.reduce((acc, layer) => {
-      acc[layer.name] = false;
+      acc[layer.type] = enabledLayers.includes(layer.type);
       return acc;
     }, {} as {[key: string]: boolean})
   );
 
   // Handle switch changes
   const handleSwitchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSwitchStates({
+    const newSwitchState = {
       ...switchStates,
-      [event.target.name]: event.target.checked,
-    });
-    onToggleLayer?.(event.target.name, event.target.checked);
+      [event.target.id]: event.target.checked,
+    };
+    setSwitchStates(newSwitchState);
+
+    // Update enabled layers, prevent duplicates
+    const enabledLayers = Object.entries(newSwitchState)
+      .filter(([, enabled]) => enabled)
+      .map(([name]) => name);
+    onToggleLayer?.(enabledLayers as LayerType[]);
   };
 
   return (
@@ -72,16 +82,17 @@ const FloatingArrowMenu: React.FC<LayerMenuProps> = ({layers, onToggleLayer}) =>
             backgroundColor: 'background.paper',
           }}
         >
-          {layers.map((layer) => (
+          {layers.filter((layer) => layer.toggleable).map((layer) => (
             <Box
               key={layer.name}
               sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', mx: 2}}
             >
               <Tooltip title={layer.description} arrow>
                 <Switch
-                  checked={switchStates[layer.name]}
+                  checked={switchStates[layer.type]}
                   onChange={handleSwitchChange}
                   name={layer.name}
+                  id={layer.type}
                 />
               </Tooltip>
               <Typography variant="caption">{layer.name}</Typography>

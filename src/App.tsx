@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import Map, {Source, Layer} from 'react-map-gl/maplibre';
 import type {FeatureCollection} from 'geojson';
 import 'maplibre-gl/dist/maplibre-gl.css';
@@ -8,7 +8,7 @@ import './App.css';
 import {Point, Feature, GeoJsonProperties} from 'geojson';
 import useLocalStorage from './customHooks';
 import FloatingArrowMenu from './layersMenu';
-import layers from './layers';
+import appLayers, {LayerType} from './layers';
 
 
 function createPointFeature(city: City): Feature<Point, GeoJsonProperties> {
@@ -27,9 +27,10 @@ function createPointFeature(city: City): Feature<Point, GeoJsonProperties> {
 
 interface MapComponentProps {
   cities: City[];
+  enabledLayers: LayerType[];
 }
 
-const MapContainer: React.FC<MapComponentProps> = ({cities}) => {
+const MapContainer: React.FC<MapComponentProps> = ({cities, enabledLayers}) => {
   const geojson: FeatureCollection = {
     type: 'FeatureCollection',
     features: []
@@ -38,6 +39,8 @@ const MapContainer: React.FC<MapComponentProps> = ({cities}) => {
   cities.forEach(city => {
     geojson.features.push(createPointFeature(city));
   });
+
+  const layers = appLayers.filter(layer => enabledLayers.includes(layer.type));
 
   return (
     <Map
@@ -60,6 +63,7 @@ const MapContainer: React.FC<MapComponentProps> = ({cities}) => {
 
 function App() {
   const [cities, setCities] = useLocalStorage<City[]>('cities', []);
+  const [enabledLayers, setEnabledLayers] = useLocalStorage<LayerType[]>('layersOn', appLayers.filter(layer => layer.defaultToggled).map(layer => layer.type));
 
   const handleAddCity = (newCity: City) => {
     setCities((prevCities) => [...prevCities, newCity]);
@@ -70,13 +74,13 @@ function App() {
   };
   return (
     <div className="app">
-      <FloatingArrowMenu layers={layers} />
+      <FloatingArrowMenu layers={appLayers} enabledLayers={enabledLayers} onToggleEvent={(layers) => setEnabledLayers(layers)} />
       <div className="sidebar-container">
         <Sidebar cities={cities} onAddCity={handleAddCity} onRemoveCity={handleRemoveCity} />
       </div>
 
       <div className="map-container">
-        <MapContainer cities={cities} />
+        <MapContainer cities={cities} enabledLayers={enabledLayers} />
       </div>
     </div>
   );
