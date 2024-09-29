@@ -43,7 +43,7 @@ const Sidebar: React.FC<SidebarProps> = ({cities, onAddCity, onRemoveCity}) => {
     <Paper
       elevation={3}
       sx={{
-        width: '300px',
+        height: '100%',
         padding: 2,
         display: 'flex',
         flexDirection: 'column',
@@ -64,6 +64,7 @@ const Sidebar: React.FC<SidebarProps> = ({cities, onAddCity, onRemoveCity}) => {
         onChange={(e) => setCityInput(e.target.value)}
         onKeyDown={handleKeyDown}
         fullWidth
+        autoFocus
       />
 
       {/* Add City Button */}
