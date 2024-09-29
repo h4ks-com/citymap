@@ -58,7 +58,7 @@ const MapContainer: React.FC<MapComponentProps> = ({cities, enabledLayers}) => {
     if (cityFields.has('timezone')) {
       timer = setInterval(() => {
         setGeojson(createGeoJSONData(cities, cityFields));
-      }, 1000);
+      }, 10000);
     }
     return () => clearInterval(timer);
   }, [cities, cityFields]);
