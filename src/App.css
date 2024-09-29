@@ -6,14 +6,14 @@
 }
 
 .sidebar-container {
-  width: 20vw;
+  width: 25;
   box-sizing: border-box;
 }
 
 .map-container {
   flex-grow: 1;
   height: 100vh;
-  width: 80vw;
+  width: 75vw;
   position: relative;
   overflow: hidden;
 }

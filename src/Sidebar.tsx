@@ -67,7 +67,7 @@ const Sidebar: React.FC<CityManagerProps> = ({cities, onAddCity, onRemoveCity}) 
       </Button>
 
       {/* City List */}
-      <List>
+      <List sx={{flexGrow: 1, overflow: 'auto'}}>
         {cities.map((city, index) => (
           <ListItem
             key={index}
