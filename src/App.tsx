@@ -68,9 +68,8 @@ function App() {
         <div className="sidebar-container">
           <Sidebar cities={cities} onAddCity={handleAddCity} onRemoveCity={handleRemoveCity} />
         </div>
-
         <div className="map-container">
-          <MapContainer cities={cities} enabledLayers={enabledLayers} />
+          <MapContainer cities={cities} enabledLayers={enabledLayers} onAddCity={handleAddCity} />
         </div>
       </div>
     </ThemeProvider>

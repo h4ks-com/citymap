@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
-import {City} from './types';
-import {geocodeCity} from './apis';
+import {CityManagerProps} from './types';
+import {geocodeCityName} from './apis';
 import {
   TextField,
   Button,
@@ -13,21 +13,15 @@ import {
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 
-interface SidebarProps {
-  cities: City[];
-  onAddCity: (city: City) => void;
-  onRemoveCity: (cityName: string) => void;
-}
-
-const Sidebar: React.FC<SidebarProps> = ({cities, onAddCity, onRemoveCity}) => {
+const Sidebar: React.FC<CityManagerProps> = ({cities, onAddCity, onRemoveCity}) => {
   const [cityInput, setCityInput] = useState('');
 
   const handleAddCity = async () => {
     if (!cityInput) return;
-    const newCity = await geocodeCity(cityInput);
+    const newCity = await geocodeCityName(cityInput);
     if (newCity) {
       setCityInput('');
-      onAddCity(newCity);
+      onAddCity?.(newCity);
     } else {
       alert('City not found!');
     }
@@ -81,7 +75,7 @@ const Sidebar: React.FC<SidebarProps> = ({cities, onAddCity, onRemoveCity}) => {
               <IconButton
                 edge="end"
                 aria-label="delete"
-                onClick={() => onRemoveCity(city.name)}
+                onClick={() => onRemoveCity?.(city.name)}
               >
                 <DeleteIcon />
               </IconButton>

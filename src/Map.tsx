@@ -2,11 +2,11 @@ import React, {useEffect, useState} from 'react';
 import Map, {Source, Layer} from 'react-map-gl/maplibre';
 import type {FeatureCollection} from 'geojson';
 import 'maplibre-gl/dist/maplibre-gl.css';
-import {City, CityHelper} from './types';
+import {City, CityHelper, CityManagerProps} from './types';
 import './App.css';
 import {Point, Feature} from 'geojson';
 import appLayers, {LayerType} from './layers';
-import {CityFields, cityFieldsFromLayers} from './apis';
+import {CityFields, cityFieldsFromLayers, reverseGeocodeCity} from './apis';
 
 interface LayerProperties {
   name: string;
@@ -38,12 +38,11 @@ const createGeoJSONData = (cities: City[], cityFields: Set<CityFields>): Feature
   };
 }
 
-interface MapComponentProps {
-  cities: City[];
+interface MapComponentProps extends CityManagerProps {
   enabledLayers: LayerType[];
 }
 
-const MapContainer: React.FC<MapComponentProps> = ({cities, enabledLayers}) => {
+const MapContainer: React.FC<MapComponentProps> = ({cities, enabledLayers, onAddCity}) => {
   const cityFields: Set<CityFields> = cityFieldsFromLayers(enabledLayers);
   const [geojson, setGeojson] = useState(createGeoJSONData([], cityFields));
   const layers = appLayers.filter(layer => enabledLayers.includes(layer.type));
@@ -75,6 +74,16 @@ const MapContainer: React.FC<MapComponentProps> = ({cities, enabledLayers}) => {
       }}
       mapStyle={`${process.env.PUBLIC_URL}/style.json`}
       style={{width: "80vw", height: "100vh"}}
+      onContextMenu={async (event) => {
+        event.preventDefault();
+        const {lng, lat} = event.lngLat;
+        const city = await reverseGeocodeCity(lat, lng);
+        if (!city) {
+          alert('Could not find city at this location');
+          return;
+        }
+        onAddCity?.(city);
+      }}
     >
       {layers.map(layer => {
         return <Source id={layer.type} type="geojson" data={geojson} key={layer.type}>
