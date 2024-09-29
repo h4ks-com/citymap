@@ -14,7 +14,7 @@ const dotsStyle: CircleLayer = {
   type: 'circle',
   source: 'circle',
   paint: {
-    'circle-radius': 12,
+    'circle-radius': 8,
     'circle-color': '#cc1236dd'
   }
 };
@@ -29,8 +29,7 @@ const nameStyle: SymbolLayer = {
     'text-variable-anchor': ['bottom'],
     'text-radial-offset': 1,
     'text-justify': 'auto',
-    'text-size': 20,
-    'text-allow-overlap': true,
+    'text-size': 18,
   },
   paint: {
     'text-color': '#000000',
@@ -50,7 +49,6 @@ const timeLayer: SymbolLayer = {
     'text-radial-offset': 1,
     'text-justify': 'auto',
     'text-size': 15,
-    'text-allow-overlap': true,
   },
   paint: {
     'text-color': '#111111',
@@ -70,7 +68,6 @@ const tempLayer: SymbolLayer = {
     'text-radial-offset': 2,
     'text-justify': 'auto',
     'text-size': 14,
-    'text-allow-overlap': true,
   },
   paint: {
     'text-color': ["case", ["<", ["coalesce", ['get', 'temperature'], 0], 21], '#0000ff', '#ff0000'],
