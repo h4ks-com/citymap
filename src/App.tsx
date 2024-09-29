@@ -1,111 +1,60 @@
-import React from 'react';
-import Map, {Source, Layer} from 'react-map-gl/maplibre';
-import type {SymbolLayer, CircleLayer} from 'react-map-gl/maplibre';
-import type {FeatureCollection} from 'geojson';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import Sidebar from './Sidebar';
 import {City} from './types';
 import './App.css';
-import {Point, Feature, GeoJsonProperties} from 'geojson';
 import useLocalStorage from './customHooks';
-
-function createPointFeature(city: City): Feature<Point, GeoJsonProperties> {
-  return {
-    type: 'Feature',
-    geometry: {
-      type: 'Point',
-      coordinates: [city.lon, city.lat],
-    },
-    properties: {
-      name: city.name,
-    },
-  };
-}
-
-
-const layerStyle: SymbolLayer = {
-  id: 'labels',
-  type: 'symbol',
-  source: 'circle',
-  layout: {
-    'text-font': ["Times New Roman Bold"],
-    'text-field': ['get', 'name'],
-    'text-variable-anchor': ['top', 'bottom', 'left', 'right'],
-    'text-radial-offset': 1,
-    'text-justify': 'auto',
-    'text-size': 20,
-  },
-  paint: {
-    'text-color': '#000000',
-    'text-halo-color': '#ffffff',
-    'text-halo-width': 2,
-  }
-};
-
-const pointsStyle: CircleLayer = {
-  id: 'point',
-  type: 'circle',
-  source: 'circle',
-  paint: {
-    'circle-radius': 12,
-    'circle-color': '#cc1236dd'
-  }
-};
-
-
-
-interface MapComponentProps {
-  cities: City[];
-}
-
-const MapContainer: React.FC<MapComponentProps> = ({cities}) => {
-  const geojson: FeatureCollection = {
-    type: 'FeatureCollection',
-    features: []
-  };
-
-  cities.forEach(city => {
-    geojson.features.push(createPointFeature(city));
-  });
-
-  return (
-    <Map
-      initialViewState={{
-        longitude: 0,
-        latitude: 0,
-        zoom: 1,
-      }}
-      mapStyle={`${process.env.PUBLIC_URL}/style.json`}
-      style={{width: "80vw", height: "100vh"}}
-    >
-      <Source id="labels" type="geojson" data={geojson}>
-        <Layer {...layerStyle} />
-      </Source>
-      <Source id="circle" type="geojson" data={geojson}>
-        <Layer {...pointsStyle} />
-      </Source>
-    </Map>
-  );
-}
+import FloatingArrowMenu from './layersMenu';
+import appLayers, {LayerType} from './layers';
+import MapContainer from './Map';
+import {batchFetchPopulateCityData, CityFields, cityFieldsFromLayers} from './apis';
+import {useEffect} from 'react';
 
 function App() {
   const [cities, setCities] = useLocalStorage<City[]>('cities', []);
+  const [enabledLayers, setEnabledLayers] = useLocalStorage<LayerType[]>('layersOn', appLayers.filter(layer => layer.defaultToggled).map(layer => layer.type));
+
+  const updateCityData = async (currentCities: City[]) => {
+    const cityFields: Set<CityFields> = cityFieldsFromLayers(enabledLayers);
+    const updatedCities = await batchFetchPopulateCityData(currentCities, cityFields);
+    setCities([...updatedCities]);
+  };
 
   const handleAddCity = (newCity: City) => {
-    setCities((prevCities) => [...prevCities, newCity]);
+    const newCities = [...cities, newCity];
+    setCities(newCities);
+    updateCityData(newCities);
   };
 
   const handleRemoveCity = (cityName: string) => {
     setCities((prevCities) => prevCities.filter(city => city.name !== cityName));
   };
+
+  useEffect(() => {
+    updateCityData(cities);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [enabledLayers]);
+
+  // Update temperature every 10 minutes
+  useEffect(() => {
+    const interval = setInterval(() => {
+      updateCityData(cities);
+    }, 10 * 60 * 1000);
+    return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <div className="app">
+      <FloatingArrowMenu layers={appLayers} enabledLayers={enabledLayers} onToggleEvent={(layers) => {
+        setEnabledLayers(layers);
+        updateCityData(cities);
+      }} />
       <div className="sidebar-container">
         <Sidebar cities={cities} onAddCity={handleAddCity} onRemoveCity={handleRemoveCity} />
       </div>
 
       <div className="map-container">
-        <MapContainer cities={cities} />
+        <MapContainer cities={cities} enabledLayers={enabledLayers} />
       </div>
     </div>
   );
