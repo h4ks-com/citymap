@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {IconButton, Box, Switch, Collapse, Typography, Paper, Tooltip} from '@mui/material';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import {LayerType} from './layers';
 import {FloatingMenuLayer} from './types';
 
@@ -43,8 +43,9 @@ const FloatingArrowMenu: React.FC<LayerMenuProps> = ({layers, enabledLayers, onT
       sx={{
         position: 'fixed',
         top: 16,
-        right: open ? '16px' : '16px',
+        right: '16px',
         display: 'flex',
+        flexDirection: 'column', // Align button and dropdown vertically
         alignItems: 'center',
         zIndex: 1000,
       }}
@@ -58,27 +59,27 @@ const FloatingArrowMenu: React.FC<LayerMenuProps> = ({layers, enabledLayers, onT
           '&:hover': {
             backgroundColor: 'primary.dark',
           },
-          transition: 'right 0.3s ease',
+          transition: 'top 0.3s ease',
         }}
       >
-        {open ? <ArrowForwardIcon /> : <ArrowBackIcon />}
+        {open ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />}
       </IconButton>
 
       {/* Dropdown Menu */}
-      <Collapse in={open} orientation="horizontal" sx={{ml: 1}}>
+      <Collapse in={open} orientation="vertical" sx={{mt: 1}}>
         <Paper
           elevation={3}
           sx={{
             padding: '8px',
             display: 'flex',
-            flexDirection: 'row', // Arrange switches horizontally
+            flexDirection: 'column', // Arrange switches vertically
             backgroundColor: 'background.paper',
           }}
         >
           {layers.filter((layer) => layer.toggleable).map((layer) => (
             <Box
               key={layer.name}
-              sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', mx: 2}}
+              sx={{display: 'flex', flexDirection: 'row', alignItems: 'center', mb: 1}}
             >
               <Tooltip title={layer.description} arrow>
                 <Switch
@@ -88,7 +89,9 @@ const FloatingArrowMenu: React.FC<LayerMenuProps> = ({layers, enabledLayers, onT
                   id={layer.type}
                 />
               </Tooltip>
-              <Typography variant="caption">{layer.name}</Typography>
+              <Typography variant="caption" sx={{ml: 1}}>
+                {layer.name}
+              </Typography>
             </Box>
           ))}
         </Paper>
