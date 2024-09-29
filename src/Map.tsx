@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import Map, {Source, Layer} from 'react-map-gl/maplibre';
 import type {FeatureCollection} from 'geojson';
 import 'maplibre-gl/dist/maplibre-gl.css';
@@ -10,7 +10,7 @@ import {CityFields, cityFieldsFromLayers} from './apis';
 
 interface LayerProperties {
   name: string;
-  subtext: string;
+  time: string;
   temperature: number | undefined;
 }
 
@@ -25,9 +25,16 @@ function createPointFeatureFromCity(city: City, cityFields: Set<CityFields>): Fe
     },
     properties: {
       name: city.name,
-      subtext: cityFields.has('timezone') ? helper.formatedCurrentTime() : '',
+      time: cityFields.has('timezone') ? helper.formatedCurrentTime() : '',
       temperature: cityFields.has('temperature') ? city.temperature : undefined,
     }
+  };
+}
+
+const createGeoJSONData = (cities: City[], cityFields: Set<CityFields>): FeatureCollection<Point, LayerProperties> => {
+  return {
+    type: 'FeatureCollection',
+    features: cities.map(city => createPointFeatureFromCity(city, cityFields)),
   };
 }
 
@@ -38,14 +45,24 @@ interface MapComponentProps {
 
 const MapContainer: React.FC<MapComponentProps> = ({cities, enabledLayers}) => {
   const cityFields: Set<CityFields> = cityFieldsFromLayers(enabledLayers);
-  const createGeoJSONData = (cities: City[], cityFields: Set<CityFields>): FeatureCollection<Point, LayerProperties> => {
-    return {
-      type: 'FeatureCollection',
-      features: cities.map(city => createPointFeatureFromCity(city, cityFields)),
-    };
-  }
-  let geojson = createGeoJSONData(cities, cityFields)
+  const [geojson, setGeojson] = useState(createGeoJSONData([], cityFields));
   const layers = appLayers.filter(layer => enabledLayers.includes(layer.type));
+
+  useEffect(() => {
+    setGeojson(createGeoJSONData(cities, cityFields));
+  }, [cities, enabledLayers]);
+
+  // If time is shown, update every time
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (cityFields.has('timezone')) {
+      timer = setInterval(() => {
+        setGeojson(createGeoJSONData(cities, cityFields));
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [cities, cityFields]);
+
 
   return (
     <Map

@@ -40,12 +40,12 @@ const nameStyle: SymbolLayer = {
 };
 
 const timeLayer: SymbolLayer = {
-  id: 'subtext',
+  id: 'time',
   type: 'symbol',
   source: 'circle',
   layout: {
     'text-font': ["Nunito Semi Bold"],
-    'text-field': ['get', 'subtext'],
+    'text-field': ['get', 'time'],
     'text-variable-anchor': ['top'],
     'text-radial-offset': 1,
     'text-justify': 'auto',
@@ -73,7 +73,7 @@ const tempLayer: SymbolLayer = {
     'text-allow-overlap': true,
   },
   paint: {
-    'text-color': ["case", ["<", ["coalesce", ['get', 'temperature'], 0], 18], '#0000ff', '#ff0000'],
+    'text-color': ["case", ["<", ["coalesce", ['get', 'temperature'], 0], 21], '#0000ff', '#ff0000'],
     'text-halo-color': '#ffffff',
     'text-halo-width': 1.0,
   }
