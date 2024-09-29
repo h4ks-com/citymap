@@ -1,6 +1,17 @@
 import React, {useState} from 'react';
 import {City} from './types';
 import {geocodeCity} from './apis';
+import {
+  TextField,
+  Button,
+  List,
+  ListItem,
+  ListItemText,
+  IconButton,
+  Typography,
+  Paper,
+} from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 interface SidebarProps {
   cities: City[];
@@ -23,32 +34,63 @@ const Sidebar: React.FC<SidebarProps> = ({cities, onAddCity, onRemoveCity}) => {
   };
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
-    if (event.key === "Enter") {
-      handleAddCity()
+    if (event.key === 'Enter') {
+      handleAddCity();
     }
-  }
+  };
 
   return (
-    <div className="sidebar">
-      <h2>Cities</h2>
-      <p>Add a city to the map:</p>
-      <input
-        type="text"
+    <Paper
+      elevation={3}
+      sx={{
+        width: '300px',
+        padding: 2,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 2,
+        backgroundColor: 'background.paper',
+      }}
+    >
+      <Typography variant="h6" gutterBottom>
+        Cities
+      </Typography>
+      <Typography variant="body1">Add a city to the map:</Typography>
+
+      {/* City Input Field */}
+      <TextField
+        label="Enter city name"
+        variant="outlined"
         value={cityInput}
         onChange={(e) => setCityInput(e.target.value)}
         onKeyDown={handleKeyDown}
-        placeholder="Enter city name"
+        fullWidth
       />
-      <button onClick={handleAddCity}>Add City</button>
-      <ul>
+
+      {/* Add City Button */}
+      <Button variant="contained" onClick={handleAddCity} fullWidth>
+        Add City
+      </Button>
+
+      {/* City List */}
+      <List>
         {cities.map((city, index) => (
-          <li key={index}>
-            {city.name}
-            <button onClick={() => onRemoveCity(city.name)}>Remove</button>
-          </li>
+          <ListItem
+            key={index}
+            secondaryAction={
+              <IconButton
+                edge="end"
+                aria-label="delete"
+                onClick={() => onRemoveCity(city.name)}
+              >
+                <DeleteIcon />
+              </IconButton>
+            }
+          >
+            <ListItemText primary={city.name} />
+          </ListItem>
         ))}
-      </ul>
-    </div>
+      </List>
+    </Paper>
   );
 };
 

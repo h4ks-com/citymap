@@ -50,6 +50,7 @@ const MapContainer: React.FC<MapComponentProps> = ({cities, enabledLayers}) => {
 
   useEffect(() => {
     setGeojson(createGeoJSONData(cities, cityFields));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cities, enabledLayers]);
 
   // If time is shown, update every time
@@ -61,6 +62,7 @@ const MapContainer: React.FC<MapComponentProps> = ({cities, enabledLayers}) => {
       }, 10000);
     }
     return () => clearInterval(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cities, cityFields]);
 
 
