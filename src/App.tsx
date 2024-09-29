@@ -34,6 +34,15 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enabledLayers]);
 
+  // Update temperature every 10 minutes
+  useEffect(() => {
+    const interval = setInterval(() => {
+      updateCityData(cities);
+    }, 10 * 60 * 1000);
+    return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <div className="app">
       <FloatingArrowMenu layers={appLayers} enabledLayers={enabledLayers} onToggleEvent={(layers) => {
