@@ -26,7 +26,7 @@ const nameStyle: SymbolLayer = {
   layout: {
     'text-font': ["Times New Roman Bold"],
     'text-field': ['get', 'name'],
-    'text-variable-anchor': ['top', 'bottom', 'left', 'right'],
+    'text-variable-anchor': ['bottom'],
     'text-radial-offset': 1,
     'text-justify': 'auto',
     'text-size': 20,
@@ -38,7 +38,7 @@ const nameStyle: SymbolLayer = {
   }
 };
 
-const subtextStyle: SymbolLayer = {
+const timeLayer: SymbolLayer = {
   id: 'subtext',
   type: 'symbol',
   source: 'circle',
@@ -54,6 +54,25 @@ const subtextStyle: SymbolLayer = {
     'text-color': '#111111',
     'text-halo-color': '#ffffff',
     'text-halo-width': 1.5,
+  }
+};
+
+const tempLayer: SymbolLayer = {
+  id: 'temperature',
+  type: 'symbol',
+  source: 'circle',
+  layout: {
+    'text-font': ["Nunito Semi Bold"],
+    'text-field': ['concat', ['get', 'temperature'], "C"],
+    'text-variable-anchor': ['left'],
+    'text-radial-offset': 2,
+    'text-justify': 'auto',
+    'text-size': 14,
+  },
+  paint: {
+    'text-color': ["case", ["<", ['get', 'temperature'], 18], '#0000ff', '#ff0000'],
+    'text-halo-color': '#ffffff',
+    'text-halo-width': 1.0,
   }
 };
 
@@ -80,7 +99,7 @@ const appLayers: AppLayer[] = [
     name: 'Local Time',
     description: 'Local time',
     defaultToggled: false,
-    spec: subtextStyle,
+    spec: timeLayer,
     toggleable: true,
   },
   {
@@ -88,7 +107,7 @@ const appLayers: AppLayer[] = [
     name: 'Temperature',
     description: 'Temperature in Celsius',
     defaultToggled: false,
-    spec: subtextStyle,
+    spec: tempLayer,
     toggleable: true,
   },
 ]

@@ -1,98 +1,32 @@
-import React, {useState} from 'react';
+import React from 'react';
 import Map, {Source, Layer} from 'react-map-gl/maplibre';
 import type {FeatureCollection} from 'geojson';
 import 'maplibre-gl/dist/maplibre-gl.css';
-import {City} from './types';
+import {City, CityHelper} from './types';
 import './App.css';
 import {Point, Feature} from 'geojson';
 import appLayers, {LayerType} from './layers';
-import axios from 'axios';
-import sha256 from 'crypto-js/sha256';
-import moment from 'moment';
-
-
-function getCityID(city: City): string {
-  // Returns hash of city coordinates and name
-  return sha256(`${city.lat}${city.lon}${city.name}`).toString();
-}
-
-async function getTemperature(city: City): Promise<City> {
-  // Fetch weather data from OpenWeather API
-  try {
-    // Get current temperature from Open-Meteo API
-    const weatherResponse = await axios.get('https://api.open-meteo.com/v1/forecast', {
-      params: {
-        latitude: city.lat,
-        longitude: city.lon,
-        current_weather: true,
-      },
-    });
-    city.temperature = weatherResponse.data.current_weather.temperature;
-    return city;
-
-  } catch (error) {
-    console.error('Error fetching temperature:', error);
-    throw error;
-  }
-}
-
-async function getCurrentTime(city: City): Promise<City> {
-  // Get local time from WorldTimeAPI
-  try {
-    const timeResponse = await axios.get(`http://worldtimeapi.org/api/timezone/Etc/GMT`, {
-      params: {
-        lat: city.lat,
-        lon: city.lon,
-      },
-    });
-    city.time = new Date(timeResponse.data.unixtime * 1000);
-    return city;
-  } catch (error) {
-    console.error('Error fetching time:', error);
-    throw error;
-  }
-}
+import {CityFields, cityFieldsFromLayers} from './apis';
 
 interface LayerProperties {
   name: string;
   subtext: string;
+  temperature: number | undefined;
 }
 
-function createPointFeature(city: City, enabledLayers: LayerType[], setGeoJSONData: (city: City, prop: LayerProperties) => void): Feature<Point, LayerProperties> {
-  let requestsArray: Promise<any>[] = [];
-
-  if (enabledLayers.includes('time')) {
-    requestsArray.push(getCurrentTime(city));
-  }
-  if (enabledLayers.includes('temperature')) {
-    requestsArray.push(getTemperature(city));
-  }
-  Promise.all(requestsArray).then((results: City[]) => {
-    for (const city of results) {
-      let subtext = '';
-      if (city.time) {
-        // Only time HH:MM is needed
-        subtext = moment(city.time).format('HH:mm');
-      }
-      if (city.temperature) {
-        subtext += ` ${city.temperature}C`;
-      }
-      setGeoJSONData(city, {name: city.name, subtext});
-    }
-  }).catch((error) => {
-    console.error('Error fetching data:', error);
-  });
-
+function createPointFeatureFromCity(city: City, cityFields: Set<CityFields>): Feature<Point, LayerProperties> {
+  const helper = new CityHelper(city);
   return {
     type: 'Feature',
-    id: getCityID(city),
+    id: helper.id(),
     geometry: {
       type: 'Point',
       coordinates: [city.lon, city.lat],
     },
     properties: {
       name: city.name,
-      subtext: '',
+      subtext: cityFields.has('timezone') ? helper.formatedCurrentTime() : '',
+      temperature: cityFields.has('temperature') ? city.temperature : undefined,
     }
   };
 }
@@ -103,27 +37,14 @@ interface MapComponentProps {
 }
 
 const MapContainer: React.FC<MapComponentProps> = ({cities, enabledLayers}) => {
-  const geojson: FeatureCollection<Point, LayerProperties> = {
-    type: 'FeatureCollection',
-    features: []
-  };
-
-  const [geoJSONData, setGeoJSONData] = useState(geojson);
-
-  cities.forEach(city => {
-    geojson.features.push(createPointFeature(city, enabledLayers, (city, prop) => {
-      setGeoJSONData((prevData) => {
-        for (let i = 0; i < prevData.features.length; i++) {
-          if (prevData.features[i].id === getCityID(city)) {
-            prevData.features[i].properties = {...prop};
-            return {...prevData};
-          }
-        }
-        return prevData;
-      });
-    }));
-  });
-
+  const cityFields: Set<CityFields> = cityFieldsFromLayers(enabledLayers);
+  const createGeoJSONData = (cities: City[], cityFields: Set<CityFields>): FeatureCollection<Point, LayerProperties> => {
+    return {
+      type: 'FeatureCollection',
+      features: cities.map(city => createPointFeatureFromCity(city, cityFields)),
+    };
+  }
+  let geojson = createGeoJSONData(cities, cityFields)
   const layers = appLayers.filter(layer => enabledLayers.includes(layer.type));
 
   return (
@@ -137,7 +58,7 @@ const MapContainer: React.FC<MapComponentProps> = ({cities, enabledLayers}) => {
       style={{width: "80vw", height: "100vh"}}
     >
       {layers.map(layer => {
-        return <Source id={layer.type} type="geojson" data={geoJSONData} key={layer.type}>
+        return <Source id={layer.type} type="geojson" data={geojson} key={layer.type}>
           <Layer {...layer.spec} />
         </Source>
       })}

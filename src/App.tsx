@@ -6,6 +6,8 @@ import useLocalStorage from './customHooks';
 import FloatingArrowMenu from './layersMenu';
 import appLayers, {LayerType} from './layers';
 import MapContainer from './Map';
+import {useEffect} from 'react';
+import {batchFetchPopulateCityData, CityFields, cityFieldsFromLayers} from './apis';
 
 function App() {
   const [cities, setCities] = useLocalStorage<City[]>('cities', []);
@@ -18,6 +20,15 @@ function App() {
   const handleRemoveCity = (cityName: string) => {
     setCities((prevCities) => prevCities.filter(city => city.name !== cityName));
   };
+
+  useEffect(() => {
+    const cityFields: Set<CityFields> = cityFieldsFromLayers(enabledLayers);
+    batchFetchPopulateCityData(cities, cityFields, (_: CityFields, updatedCities: City[]) => {
+      setCities(updatedCities);
+    });
+  }, [enabledLayers, cities, setCities]);
+
+
   return (
     <div className="app">
       <FloatingArrowMenu layers={appLayers} enabledLayers={enabledLayers} onToggleEvent={(layers) => setEnabledLayers(layers)} />
