@@ -132,7 +132,6 @@ export async function reverseGeocodeCity(lat: number, lon: number): Promise<City
         zoom: 10,
       },
     });
-    console.debug(response.data);
 
     if (!response.data.display_name) {
       return null;
