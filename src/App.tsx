@@ -6,15 +6,23 @@ import useLocalStorage from './customHooks';
 import FloatingArrowMenu from './layersMenu';
 import appLayers, {LayerType} from './layers';
 import MapContainer from './Map';
-import {useEffect} from 'react';
 import {batchFetchPopulateCityData, CityFields, cityFieldsFromLayers} from './apis';
+import {useEffect} from 'react';
 
 function App() {
   const [cities, setCities] = useLocalStorage<City[]>('cities', []);
   const [enabledLayers, setEnabledLayers] = useLocalStorage<LayerType[]>('layersOn', appLayers.filter(layer => layer.defaultToggled).map(layer => layer.type));
 
+  const updateCityData = async (currentCities: City[]) => {
+    const cityFields: Set<CityFields> = cityFieldsFromLayers(enabledLayers);
+    const updatedCities = await batchFetchPopulateCityData(currentCities, cityFields);
+    setCities([...updatedCities]);
+  };
+
   const handleAddCity = (newCity: City) => {
-    setCities((prevCities) => [...prevCities, newCity]);
+    const newCities = [...cities, newCity];
+    setCities(newCities);
+    updateCityData(newCities);
   };
 
   const handleRemoveCity = (cityName: string) => {
@@ -22,16 +30,16 @@ function App() {
   };
 
   useEffect(() => {
-    const cityFields: Set<CityFields> = cityFieldsFromLayers(enabledLayers);
-    batchFetchPopulateCityData(cities, cityFields, (_: CityFields, updatedCities: City[]) => {
-      setCities(updatedCities);
-    });
-  }, [enabledLayers, cities, setCities]);
-
+    updateCityData(cities);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [enabledLayers]);
 
   return (
     <div className="app">
-      <FloatingArrowMenu layers={appLayers} enabledLayers={enabledLayers} onToggleEvent={(layers) => setEnabledLayers(layers)} />
+      <FloatingArrowMenu layers={appLayers} enabledLayers={enabledLayers} onToggleEvent={(layers) => {
+        setEnabledLayers(layers);
+        updateCityData(cities);
+      }} />
       <div className="sidebar-container">
         <Sidebar cities={cities} onAddCity={handleAddCity} onRemoveCity={handleRemoveCity} />
       </div>

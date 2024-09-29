@@ -50,7 +50,8 @@ type BatchMap = {
   timezone: Promise<void>[],
   temperature: Promise<void>[],
 }
-export type CityFields = keyof BatchMap;
+
+export type CityFields = keyof City;
 
 export function cityFieldsFromLayers(enabledLayers: string[]): Set<CityFields> {
   // Convert enabled layers to city fields
@@ -64,13 +65,12 @@ export function cityFieldsFromLayers(enabledLayers: string[]): Set<CityFields> {
   return cityFields;
 }
 
-export function batchFetchPopulateCityData(
+export async function batchFetchPopulateCityData(
   cities: City[],
   fields: Set<CityFields>,
-  onFinishedField: (field: CityFields, updatedCities: City[]) => void
-) {
+): Promise<City[]> {
   // Fetch timezone and temperature for every city and calls onFinish when done with each field idependently in background
-  if (!fields.size || !cities.length) return;
+  if (!fields.size || !cities.length) return cities;
 
   // Store all promises in a ojbect of promise arrays
   const cityDataPromises: BatchMap = {timezone: [], temperature: []};
@@ -90,16 +90,9 @@ export function batchFetchPopulateCityData(
     }
   });
 
-  if (fields.has("timezone")) {
-    Promise.all(cityDataPromises.timezone.map(promise => requestWithRetry(() => promise))).then(() => {
-      onFinishedField("timezone", cities);
-    });
-  }
-  if (fields.has("temperature")) {
-    Promise.all(cityDataPromises.temperature.map(promise => requestWithRetry(() => promise))).then(() => {
-      onFinishedField("temperature", cities);
-    });
-  }
+  // Wait for all promises to resolve
+  await Promise.all(cityDataPromises.timezone.concat(cityDataPromises.temperature).map(promise => requestWithRetry(() => promise)));
+  return cities;
 }
 
 export async function geocodeCity(cityInput: string): Promise<City | null> {

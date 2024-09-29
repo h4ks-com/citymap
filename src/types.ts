@@ -22,16 +22,9 @@ export class CityHelper {
 
   formatedCurrentTime(): string {
     if (!this.city.timezone) {
-      return 'Unknown';
+      return '00:00:00';
     }
     return (new Date()).toLocaleString([], {timeZone: this.city.timezone}).split(", ")[1]
-  }
-
-  formatedTemperature(): string {
-    if (!this.city.temperature) {
-      return '(?)C';
-    }
-    return `${this.city.temperature}C`;
   }
 }
 

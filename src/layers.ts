@@ -30,6 +30,7 @@ const nameStyle: SymbolLayer = {
     'text-radial-offset': 1,
     'text-justify': 'auto',
     'text-size': 20,
+    'text-allow-overlap': true,
   },
   paint: {
     'text-color': '#000000',
@@ -49,6 +50,7 @@ const timeLayer: SymbolLayer = {
     'text-radial-offset': 1,
     'text-justify': 'auto',
     'text-size': 15,
+    'text-allow-overlap': true,
   },
   paint: {
     'text-color': '#111111',
@@ -63,14 +65,15 @@ const tempLayer: SymbolLayer = {
   source: 'circle',
   layout: {
     'text-font': ["Nunito Semi Bold"],
-    'text-field': ['concat', ['get', 'temperature'], "C"],
+    'text-field': ['concat', ["coalesce", ['get', 'temperature'], "(?)"], "C"],
     'text-variable-anchor': ['left'],
     'text-radial-offset': 2,
     'text-justify': 'auto',
     'text-size': 14,
+    'text-allow-overlap': true,
   },
   paint: {
-    'text-color': ["case", ["<", ['get', 'temperature'], 18], '#0000ff', '#ff0000'],
+    'text-color': ["case", ["<", ["coalesce", ['get', 'temperature'], 0], 18], '#0000ff', '#ff0000'],
     'text-halo-color': '#ffffff',
     'text-halo-width': 1.0,
   }
