@@ -11,6 +11,7 @@ import {
   Typography,
   Paper,
   InputAdornment,
+  Box,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ClearIcon from '@mui/icons-material/Clear';
@@ -39,6 +40,28 @@ const Sidebar: React.FC<CityManagerProps> = ({cities, onAddCity, onRemoveCity}) 
   const displayCities = cities.filter((city) =>
     isSearching() ? city.name.toLowerCase().trim().includes(cityInput.toLowerCase().trim()) : true
   );
+
+  const highlightText = (text: string, highlight: string) => {
+    if (!isSearching()) return text;
+    const parts = text.split(new RegExp(`(${highlight})`, 'gi'));
+    return (
+      <span>
+        {parts.map((part, index) =>
+          part.toLowerCase() === highlight.toLowerCase() ? (
+            <Typography
+              key={index}
+              component="span"
+              sx={{fontWeight: 'bold', color: '#f06292'}}
+            >
+              {part}
+            </Typography>
+          ) : (
+            <span key={index}>{part}</span>
+          )
+        )}
+      </span>
+    );
+  };
 
   return (
     <Paper
@@ -74,9 +97,7 @@ const Sidebar: React.FC<CityManagerProps> = ({cities, onAddCity, onRemoveCity}) 
                   onClick={() => setCityInput('')}
                   edge="end"
                   aria-label="clear input"
-                  sx={{
-                    color: 'red', // Set the clear icon color to red
-                  }}
+                  sx={{color: 'red'}}
                 >
                   <ClearIcon />
                 </IconButton>
@@ -115,7 +136,13 @@ const Sidebar: React.FC<CityManagerProps> = ({cities, onAddCity, onRemoveCity}) 
               </IconButton>
             }
           >
-            <ListItemText primary={city.name} />
+            <ListItemText
+              primary={
+                <Box>
+                  {highlightText(city.name, cityInput)}
+                </Box>
+              }
+            />
           </ListItem>
         ))}
       </List>
