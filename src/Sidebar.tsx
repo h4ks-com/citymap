@@ -33,6 +33,9 @@ const Sidebar: React.FC<CityManagerProps> = ({cities, onAddCity, onRemoveCity}) 
     }
   };
 
+  const isSearching = () => cityInput.length >= 3;
+  const displayCities = cities.filter((city) => isSearching() ? city.name.toLowerCase().trim().includes(cityInput.toLowerCase().trim()) : true);
+
   return (
     <Paper
       elevation={3}
@@ -53,6 +56,7 @@ const Sidebar: React.FC<CityManagerProps> = ({cities, onAddCity, onRemoveCity}) 
       {/* City Input Field */}
       <TextField
         label="Enter city name"
+        type='search'
         variant="outlined"
         value={cityInput}
         onChange={(e) => setCityInput(e.target.value)}
@@ -68,7 +72,18 @@ const Sidebar: React.FC<CityManagerProps> = ({cities, onAddCity, onRemoveCity}) 
 
       {/* City List */}
       <List sx={{flexGrow: 1, overflow: 'auto'}}>
-        {cities.map((city, index) => (
+        {
+          isSearching() && (
+            <ListItem key="searching" sx={{cursor: 'default', color: 'text.disabled'}}>
+              {
+                displayCities.length === 0 ?
+                  (<ListItemText primary={`No results for "${cityInput}"`} />)
+                  : (<ListItemText primary={`Searching for "${cityInput}"...`} />)
+              }
+            </ListItem>
+          )
+        }
+        {displayCities.map((city, index) => (
           <ListItem
             key={index}
             secondaryAction={
