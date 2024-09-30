@@ -113,7 +113,7 @@ const Sidebar: React.FC<CityManagerProps> = ({cities, onAddCity, onRemoveCity}) 
       </Button>
 
       {/* City List */}
-      <List sx={{flexGrow: 1, overflow: 'auto'}}>
+      <List sx={{flexGrow: 1, overflow: 'scroll'}}>
         {isSearching() && (
           <ListItem key="searching" sx={{cursor: 'default', color: 'text.disabled'}}>
             {displayCities.length === 0 ? (
