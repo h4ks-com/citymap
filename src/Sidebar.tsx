@@ -10,8 +10,10 @@ import {
   IconButton,
   Typography,
   Paper,
+  InputAdornment,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
+import ClearIcon from '@mui/icons-material/Clear';
 
 const Sidebar: React.FC<CityManagerProps> = ({cities, onAddCity, onRemoveCity}) => {
   const [cityInput, setCityInput] = useState('');
@@ -34,7 +36,9 @@ const Sidebar: React.FC<CityManagerProps> = ({cities, onAddCity, onRemoveCity}) 
   };
 
   const isSearching = () => cityInput.length >= 3;
-  const displayCities = cities.filter((city) => isSearching() ? city.name.toLowerCase().trim().includes(cityInput.toLowerCase().trim()) : true);
+  const displayCities = cities.filter((city) =>
+    isSearching() ? city.name.toLowerCase().trim().includes(cityInput.toLowerCase().trim()) : true
+  );
 
   return (
     <Paper
@@ -56,13 +60,30 @@ const Sidebar: React.FC<CityManagerProps> = ({cities, onAddCity, onRemoveCity}) 
       {/* City Input Field */}
       <TextField
         label="Enter city name"
-        type='search'
         variant="outlined"
         value={cityInput}
         onChange={(e) => setCityInput(e.target.value)}
         onKeyDown={handleKeyDown}
         fullWidth
         autoFocus
+        slotProps={{
+          input: {
+            endAdornment: cityInput && (
+              <InputAdornment position="end">
+                <IconButton
+                  onClick={() => setCityInput('')}
+                  edge="end"
+                  aria-label="clear input"
+                  sx={{
+                    color: 'red', // Set the clear icon color to red
+                  }}
+                >
+                  <ClearIcon />
+                </IconButton>
+              </InputAdornment>
+            ),
+          },
+        }}
       />
 
       {/* Add City Button */}
@@ -72,17 +93,15 @@ const Sidebar: React.FC<CityManagerProps> = ({cities, onAddCity, onRemoveCity}) 
 
       {/* City List */}
       <List sx={{flexGrow: 1, overflow: 'auto'}}>
-        {
-          isSearching() && (
-            <ListItem key="searching" sx={{cursor: 'default', color: 'text.disabled'}}>
-              {
-                displayCities.length === 0 ?
-                  (<ListItemText primary={`No results for "${cityInput}"`} />)
-                  : (<ListItemText primary={`Searching for "${cityInput}"...`} />)
-              }
-            </ListItem>
-          )
-        }
+        {isSearching() && (
+          <ListItem key="searching" sx={{cursor: 'default', color: 'text.disabled'}}>
+            {displayCities.length === 0 ? (
+              <ListItemText primary={`No results for "${cityInput}"`} />
+            ) : (
+              <ListItemText primary={`Searching for "${cityInput}"...`} />
+            )}
+          </ListItem>
+        )}
         {displayCities.map((city, index) => (
           <ListItem
             key={index}
