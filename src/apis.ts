@@ -95,7 +95,7 @@ export async function batchFetchPopulateCityData(
   return cities;
 }
 
-export async function geocodeCity(cityInput: string): Promise<City | null> {
+export async function geocodeCityName(cityInput: string): Promise<City | null> {
   try {
     // Use Nominatim API for geocoding the city
     const response = await axios.get(`https://nominatim.openstreetmap.org/search`, {
@@ -114,6 +114,33 @@ export async function geocodeCity(cityInput: string): Promise<City | null> {
       name: cityData.display_name.split(',')[0],
       lat: parseFloat(cityData.lat),
       lon: parseFloat(cityData.lon),
+    };
+  } catch (error) {
+    console.error('Error fetching city data', error);
+    throw error;
+  }
+}
+
+export async function reverseGeocodeCity(lat: number, lon: number): Promise<City | null> {
+  try {
+    // Use Nominatim API for reverse geocoding the city
+    const response = await axios.get(`https://nominatim.openstreetmap.org/reverse`, {
+      params: {
+        lat,
+        lon,
+        format: 'json',
+        zoom: 10,
+      },
+    });
+
+    if (!response.data.display_name) {
+      return null;
+    }
+
+    return {
+      name: response.data.display_name.split(',')[0],
+      lat: response.data.lat,
+      lon: response.data.lon,
     };
   } catch (error) {
     console.error('Error fetching city data', error);

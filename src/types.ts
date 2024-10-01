@@ -35,3 +35,10 @@ export interface FloatingMenuLayer {
   defaultToggled: boolean;
   toggleable: boolean;
 }
+
+export interface CityManagerProps {
+  cities: City[];
+  onAddCity?: (city: City) => void;
+  onRemoveCity?: (cityName: string) => void;
+}
+

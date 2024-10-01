@@ -8,6 +8,20 @@ import appLayers, {LayerType} from './layers';
 import MapContainer from './Map';
 import {batchFetchPopulateCityData, CityFields, cityFieldsFromLayers} from './apis';
 import {useEffect} from 'react';
+import {ThemeProvider, createTheme} from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
+
+const darkTheme = createTheme({
+  palette: {
+    mode: 'dark',
+    primary: {
+      main: '#d81b60',
+    },
+    secondary: {
+      main: '#f06292',
+    },
+  },
+});
 
 function App() {
   const [cities, setCities] = useLocalStorage<City[]>('cities', []);
@@ -44,19 +58,21 @@ function App() {
   }, []);
 
   return (
-    <div className="app">
-      <FloatingArrowMenu layers={appLayers} enabledLayers={enabledLayers} onToggleEvent={(layers) => {
-        setEnabledLayers(layers);
-        updateCityData(cities);
-      }} />
-      <div className="sidebar-container">
-        <Sidebar cities={cities} onAddCity={handleAddCity} onRemoveCity={handleRemoveCity} />
+    <ThemeProvider theme={darkTheme}>
+      <CssBaseline />
+      <div className="app">
+        <FloatingArrowMenu layers={appLayers} enabledLayers={enabledLayers} onToggleEvent={(layers) => {
+          setEnabledLayers(layers);
+          updateCityData(cities);
+        }} />
+        <div className="sidebar-container">
+          <Sidebar cities={cities} onAddCity={handleAddCity} onRemoveCity={handleRemoveCity} />
+        </div>
+        <div className="map-container">
+          <MapContainer cities={cities} enabledLayers={enabledLayers} onAddCity={handleAddCity} />
+        </div>
       </div>
-
-      <div className="map-container">
-        <MapContainer cities={cities} enabledLayers={enabledLayers} />
-      </div>
-    </div>
+    </ThemeProvider>
   );
 }
 
