@@ -98,6 +98,7 @@ const Sidebar: React.FC<CityManagerProps> = ({cities, onAddCity, onRemoveCity}) 
                   edge="end"
                   aria-label="clear input"
                   sx={{color: 'red'}}
+                  tabIndex={-1}
                 >
                   <ClearIcon />
                 </IconButton>
