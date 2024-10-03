@@ -2,6 +2,7 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp'
 import {
   Box,
+  Button,
   Collapse,
   IconButton,
   Paper,
@@ -12,21 +13,26 @@ import {
 import React, {useState} from 'react'
 
 import {LayerType} from '../layers'
-import {FloatingMenuLayer} from '../types'
+import {City, FloatingMenuLayer} from '../types'
 
 // Example layers array
 interface LayerMenuProps {
   layers: FloatingMenuLayer[]
   enabledLayers: string[]
   onToggleEvent?: (enabledLayers: LayerType[]) => void
+  onFlyLoop?: (flyLooping: boolean) => void
+  cities: City[]
 }
 
 const FloatingArrowMenu: React.FC<LayerMenuProps> = ({
   layers,
   enabledLayers,
   onToggleEvent: onToggleLayer,
+  onFlyLoop,
+  cities,
 }) => {
   const [open, setOpen] = useState<boolean>(false)
+  const [flyLooping, setFlyLooping] = useState<boolean>(false)
 
   // Initialize state with all switches
   const [switchStates, setSwitchStates] = useState<{[key: string]: boolean}>(
@@ -116,6 +122,34 @@ const FloatingArrowMenu: React.FC<LayerMenuProps> = ({
                 </Typography>
               </Box>
             ))}
+          <Box
+            key='loop'
+            sx={{
+              display: 'flex',
+              flexDirection: 'row',
+              alignItems: 'center',
+              mb: 1,
+            }}
+          >
+            <Tooltip
+              title="Fly over all the cities in the sideba's order"
+              arrow
+              sx={{mt: 3}}
+            >
+              <Button
+                variant='contained'
+                fullWidth
+                onClick={() => {
+                  if (flyLooping) return
+                  setFlyLooping(!flyLooping)
+                  onFlyLoop?.(!flyLooping)
+                }}
+                disabled={cities.length < 2}
+              >
+                Fly Loop
+              </Button>
+            </Tooltip>
+          </Box>
         </Paper>
       </Collapse>
     </Box>

@@ -32,6 +32,12 @@ const darkTheme = createTheme({
   },
 })
 
+type FlyLoopState = {
+  index: number
+  isLooping: boolean
+  interval?: NodeJS.Timeout
+}
+
 function App() {
   const [cities, setCities] = useLocalStorage<City[]>('cities', [])
   const [enabledLayers, setEnabledLayers] = useLocalStorage<LayerType[]>(
@@ -39,6 +45,10 @@ function App() {
     appSources.filter(layer => layer.defaultToggled).map(layer => layer.type),
   )
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
+  const [flyLoopState, setFlyLoopState] = useState<FlyLoopState>({
+    index: 0,
+    isLooping: false,
+  })
   const isHighWidth = useMediaQuery('(min-width:600px)')
   const map = useRef<maplibregl.Map>()
 
@@ -105,6 +115,36 @@ function App() {
     setIsSidebarCollapsed(!isHighWidth)
   }, [isHighWidth, setIsSidebarCollapsed])
 
+  // Fly loop
+  useEffect(() => {
+    // TODO there is no way to stop this but resfreshing the page
+    if (flyLoopState.isLooping && !flyLoopState.interval && cities.length > 1) {
+      flyToCity(cities[flyLoopState.index])
+      map.current?.once('moveend', () => {
+        if (!flyLoopState.isLooping) return
+        const interval = setTimeout(() => {
+          if (!flyLoopState.isLooping) return
+          setFlyLoopState({
+            ...flyLoopState,
+            index: (flyLoopState.index + 1) % cities.length,
+          })
+        }, 5000)
+        setFlyLoopState({
+          ...flyLoopState,
+          interval,
+        })
+      })
+    }
+    if (!flyLoopState.isLooping && flyLoopState.interval) {
+      map.current?.stop()
+      clearInterval(flyLoopState.interval)
+      setFlyLoopState({
+        ...flyLoopState,
+        interval: undefined,
+      })
+    }
+  }, [cities, flyLoopState])
+
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
@@ -112,11 +152,25 @@ function App() {
         <AlertProvider>
           <div style={{zIndex: 1000}}>
             <FloatingArrowMenu
+              cities={cities}
               layers={appSources}
               enabledLayers={enabledLayers}
               onToggleEvent={layers => {
                 setEnabledLayers(layers)
                 updateCityData(cities)
+              }}
+              onFlyLoop={t => {
+                if (t) {
+                  setFlyLoopState({
+                    ...flyLoopState,
+                    isLooping: t,
+                  })
+                } else {
+                  setFlyLoopState({
+                    ...flyLoopState,
+                    isLooping: t,
+                  })
+                }
               }}
             />
           </div>
