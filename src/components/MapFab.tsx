@@ -2,8 +2,8 @@ import React, {useState} from 'react';
 import {IconButton, Box, Switch, Collapse, Typography, Paper, Tooltip} from '@mui/material';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
-import {LayerType} from './layers';
-import {FloatingMenuLayer} from './types';
+import {LayerType} from '../layers';
+import {FloatingMenuLayer} from '../types';
 
 // Example layers array
 interface LayerMenuProps {

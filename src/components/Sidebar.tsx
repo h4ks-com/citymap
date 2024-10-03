@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
-import {CityManagerProps} from './types';
-import {geocodeCityName} from './apis';
+import {CityManagerProps} from '../types';
+import {geocodeCityName} from '../apis';
 import {
   TextField,
   Button,

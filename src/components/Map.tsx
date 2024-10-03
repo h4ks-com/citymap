@@ -2,11 +2,10 @@ import React, {useEffect, useState} from 'react';
 import Map, {Source, Layer} from 'react-map-gl/maplibre';
 import type {FeatureCollection} from 'geojson';
 import 'maplibre-gl/dist/maplibre-gl.css';
-import {City, CityHelper, CityManagerProps} from './types';
-import './App.css';
+import {City, CityHelper, CityManagerProps} from '../types';
 import {Point, Feature} from 'geojson';
-import appLayers, {LayerType} from './layers';
-import {CityFields, cityFieldsFromLayers, reverseGeocodeCity} from './apis';
+import appLayers, {LayerType} from '../layers';
+import {CityFields, cityFieldsFromLayers, reverseGeocodeCity} from '../apis';
 
 interface LayerProperties {
   name: string;

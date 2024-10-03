@@ -1,11 +1,11 @@
 import 'maplibre-gl/dist/maplibre-gl.css';
-import Sidebar from './Sidebar';
+import Sidebar from './components/Sidebar';
 import {City} from './types';
 import './App.css';
 import useLocalStorage from './customHooks';
-import FloatingArrowMenu from './layersMenu';
+import FloatingArrowMenu from './components/MapFab';
 import appLayers, {LayerType} from './layers';
-import MapContainer from './Map';
+import MapContainer from './components/Map';
 import {batchFetchPopulateCityData, CityFields, cityFieldsFromLayers} from './apis';
 import {useEffect} from 'react';
 import {ThemeProvider, createTheme} from '@mui/material/styles';
