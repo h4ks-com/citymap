@@ -15,7 +15,7 @@ import FloatingArrowMenu from './components/MapFab'
 import Sidebar from './components/Sidebar'
 import useLocalStorage from './customHooks'
 import appSources, {LayerType} from './layers'
-import {City} from './types'
+import {City, CityHelper} from './types'
 
 const darkTheme = createTheme({
   palette: {
@@ -47,6 +47,12 @@ function App() {
   }
 
   const handleAddCity = (newCity: City) => {
+    // If duplicate, we fly to the city
+    const helper = new CityHelper(newCity)
+    if (cities.some(city => helper.id() === new CityHelper(city).id())) {
+      flyToCity(newCity)
+      return
+    }
     const newCities = [...cities, newCity]
     setCities(newCities)
     updateCityData(newCities)
