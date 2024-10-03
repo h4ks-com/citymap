@@ -28,18 +28,17 @@ interface AppProps {
 
 const Main: React.FC<AppProps> = ({StorageClass}) => {
   const [cities, setCities] = useStorage<City[]>(StorageClass, 'cities', []);
-
   const [enabledLayers, setEnabledLayers] = useStorage<LayerType[]>(
     LocalStorage,
     'layersOn',
     appSources.filter(layer => layer.defaultToggled).map(layer => layer.type),
   );
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [flyLoopState, setFlyLoopState] = useState<FlyLoopState>({
     index: 0,
     isLooping: false,
   });
   const isHighWidth = useMediaQuery('(min-width:600px)');
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(!isHighWidth);
   const map = useRef<maplibregl.Map>();
 
   const updateCityData = async (currentCities: City[]) => {
@@ -161,14 +160,15 @@ const Main: React.FC<AppProps> = ({StorageClass}) => {
           }}
         />
       </div>
-      <div style={{zIndex: 3000}}>
+      <div style={{zIndex: 4000}}>
         <FloatingArrowSidebar
           isCollapsed={isSidebarCollapsed}
           onClick={() => {
             setIsSidebarCollapsed(!isSidebarCollapsed);
           }}
           sx={{
-            left: isSidebarCollapsed ? '16px' : isHighWidth ? '18vw' : '90vw',
+            left: isSidebarCollapsed ? '16px' : isHighWidth ? '18vw' : '85vw',
+            top: '24px',
           }}
         />
       </div>
