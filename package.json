@@ -32,7 +32,7 @@
     "eject": "react-scripts eject",
     "prepare": "husky",
     "check": "prettier --check src/**/*.{ts,tsx}",
-    "lint": "prettier --write src/**/*.{ts,tsx}"
+    "format": "prettier --write src/**/*.{ts,tsx}"
   },
   "eslintConfig": {
     "extends": [

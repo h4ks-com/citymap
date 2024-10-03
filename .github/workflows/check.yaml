@@ -19,7 +19,7 @@ jobs:
           node-version: 20
 
       - name: Install Dependencies
-        run: npm install; 
+        run: npm install;
 
       - name: Workarounds for v8 9
         run: npm i -g npm@8 && npm install -g react-scripts

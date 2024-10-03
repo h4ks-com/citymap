@@ -21,6 +21,7 @@ const Sidebar: React.FC<CityManagerProps> = ({
   cities,
   onAddCity,
   onRemoveCity,
+  onCityClick,
 }) => {
   const [cityInput, setCityInput] = useState('')
 
@@ -147,8 +148,16 @@ const Sidebar: React.FC<CityManagerProps> = ({
               </IconButton>
             }
           >
+            {/* Make city name clickable by attaching onClick */}
             <ListItemText
-              primary={<Box>{highlightText(city.name, cityInput)}</Box>}
+              primary={
+                <Box
+                  onClick={() => onCityClick?.(city)} // Handle city click event
+                  sx={{cursor: 'pointer'}} // Show pointer cursor on hover
+                >
+                  {highlightText(city.name, cityInput)}
+                </Box>
+              }
             />
           </ListItem>
         ))}

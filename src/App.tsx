@@ -1,7 +1,8 @@
 import CssBaseline from '@mui/material/CssBaseline'
 import {ThemeProvider, createTheme} from '@mui/material/styles'
 import 'maplibre-gl/dist/maplibre-gl.css'
-import {useEffect} from 'react'
+import {useEffect, useRef} from 'react'
+import React from 'react'
 
 import './App.css'
 import {
@@ -13,7 +14,7 @@ import MapContainer from './components/Map'
 import FloatingArrowMenu from './components/MapFab'
 import Sidebar from './components/Sidebar'
 import useLocalStorage from './customHooks'
-import appLayers, {LayerType} from './layers'
+import appSources, {LayerType} from './layers'
 import {City} from './types'
 
 const darkTheme = createTheme({
@@ -32,8 +33,9 @@ function App() {
   const [cities, setCities] = useLocalStorage<City[]>('cities', [])
   const [enabledLayers, setEnabledLayers] = useLocalStorage<LayerType[]>(
     'layersOn',
-    appLayers.filter(layer => layer.defaultToggled).map(layer => layer.type),
+    appSources.filter(layer => layer.defaultToggled).map(layer => layer.type),
   )
+  const map = useRef<maplibregl.Map>()
 
   const updateCityData = async (currentCities: City[]) => {
     const cityFields: Set<CityFields> = cityFieldsFromLayers(enabledLayers)
@@ -52,6 +54,18 @@ function App() {
 
   const handleRemoveCity = (cityName: string) => {
     setCities(prevCities => prevCities.filter(city => city.name !== cityName))
+  }
+  const flyToCity = (city: City) => {
+    map?.current?.flyTo({
+      center: [city.lon, city.lat],
+      zoom: 10,
+      speed: 3,
+      curve: 2,
+      easing(t) {
+        return t
+      },
+      essential: true,
+    })
   }
 
   useEffect(() => {
@@ -76,7 +90,7 @@ function App() {
       <CssBaseline />
       <div className='app'>
         <FloatingArrowMenu
-          layers={appLayers}
+          layers={appSources}
           enabledLayers={enabledLayers}
           onToggleEvent={layers => {
             setEnabledLayers(layers)
@@ -88,13 +102,18 @@ function App() {
             cities={cities}
             onAddCity={handleAddCity}
             onRemoveCity={handleRemoveCity}
+            onCityClick={flyToCity}
           />
         </div>
         <div className='map-container'>
           <MapContainer
             cities={cities}
+            onCityClick={flyToCity}
             enabledLayers={enabledLayers}
             onAddCity={handleAddCity}
+            onMapLoad={loadedMap => {
+              map.current = loadedMap
+            }}
           />
         </div>
       </div>

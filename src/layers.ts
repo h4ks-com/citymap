@@ -16,7 +16,25 @@ const dotsStyle: CircleLayer = {
   source: 'circle',
   paint: {
     'circle-radius': 8,
-    'circle-color': '#cc1236dd',
+    'circle-color': [
+      'case',
+      ['boolean', ['feature-state', 'hover'], false],
+      '#faa',
+      '#dd1236ff',
+    ],
+    'circle-stroke-width': [
+      'case',
+      ['boolean', ['feature-state', 'hover'], false],
+      5,
+      0,
+    ],
+    'circle-stroke-color': [
+      'case',
+      ['boolean', ['feature-state', 'hover'], false],
+      '#ff9',
+      '#ffffff',
+    ],
+    'circle-stroke-opacity': 0.8,
   },
 }
 
@@ -34,8 +52,9 @@ const nameStyle: SymbolLayer = {
   },
   paint: {
     'text-color': '#000000',
+    'text-halo-blur': 2,
     'text-halo-color': '#ffffff',
-    'text-halo-width': 2,
+    'text-halo-width': 1.5,
   },
 }
 
@@ -53,8 +72,9 @@ const timeLayer: SymbolLayer = {
   },
   paint: {
     'text-color': '#111111',
-    'text-halo-color': '#ffffff',
-    'text-halo-width': 1.5,
+    'text-halo-color': '#eeed',
+    'text-halo-blur': 1,
+    'text-halo-width': 2,
   },
 }
 
@@ -66,7 +86,7 @@ const tempLayer: SymbolLayer = {
     'text-font': ['Nunito Semi Bold'],
     'text-field': ['concat', ['coalesce', ['get', 'temperature'], '(?)'], 'C'],
     'text-variable-anchor': ['left'],
-    'text-radial-offset': 2,
+    'text-radial-offset': 1,
     'text-justify': 'auto',
     'text-size': 14,
   },
@@ -77,12 +97,13 @@ const tempLayer: SymbolLayer = {
       '#0000ff',
       '#ff0000',
     ],
-    'text-halo-color': '#ffffff',
-    'text-halo-width': 1.0,
+    'text-halo-color': '#fffd',
+    'text-halo-blur': 1,
+    'text-halo-width': 1.5,
   },
 }
 
-const appLayers: AppLayer[] = [
+const appSources: AppLayer[] = [
   {
     type: 'dots',
     name: 'Markers',
@@ -117,4 +138,4 @@ const appLayers: AppLayer[] = [
   },
 ]
 
-export default appLayers
+export default appSources
