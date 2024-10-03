@@ -1,5 +1,6 @@
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
-import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp'
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
+import ShareIcon from '@mui/icons-material/Share';
 import {
   Box,
   Button,
@@ -9,19 +10,21 @@ import {
   Switch,
   Tooltip,
   Typography,
-} from '@mui/material'
-import React, {useState} from 'react'
+} from '@mui/material';
+import React, {useState} from 'react';
+import {CopyToClipboard} from 'react-copy-to-clipboard';
 
-import {LayerType} from '../layers'
-import {City, FloatingMenuLayer} from '../types'
+import {LayerType} from '../layers';
+import {objectToQueryString} from '../storage';
+import {City, FloatingMenuLayer} from '../types';
 
 // Example layers array
 interface LayerMenuProps {
-  layers: FloatingMenuLayer[]
-  enabledLayers: string[]
-  onToggleEvent?: (enabledLayers: LayerType[]) => void
-  onFlyLoop?: (flyLooping: boolean) => void
-  cities: City[]
+  layers: FloatingMenuLayer[];
+  enabledLayers: string[];
+  onToggleEvent?: (enabledLayers: LayerType[]) => void;
+  onFlyLoop?: (flyLooping: boolean) => void;
+  cities: City[];
 }
 
 const FloatingArrowMenu: React.FC<LayerMenuProps> = ({
@@ -31,34 +34,39 @@ const FloatingArrowMenu: React.FC<LayerMenuProps> = ({
   onFlyLoop,
   cities,
 }) => {
-  const [open, setOpen] = useState<boolean>(false)
-  const [flyLooping, setFlyLooping] = useState<boolean>(false)
+  const [open, setOpen] = useState<boolean>(false);
+  const [flyLooping, setFlyLooping] = useState<boolean>(false);
 
   // Initialize state with all switches
   const [switchStates, setSwitchStates] = useState<{[key: string]: boolean}>(
     layers.reduce(
       (acc, layer) => {
-        acc[layer.type] = enabledLayers.includes(layer.type)
-        return acc
+        acc[layer.type] = enabledLayers.includes(layer.type);
+        return acc;
       },
       {} as {[key: string]: boolean},
     ),
-  )
+  );
 
   // Handle switch changes
   const handleSwitchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newSwitchState = {
       ...switchStates,
       [event.target.id]: event.target.checked,
-    }
-    setSwitchStates(newSwitchState)
+    };
+    setSwitchStates(newSwitchState);
 
     // Update enabled layers, prevent duplicates
     const enabledLayers = Object.entries(newSwitchState)
       .filter(([, enabled]) => enabled)
-      .map(([name]) => name)
-    onToggleLayer?.(enabledLayers as LayerType[])
-  }
+      .map(([name]) => name);
+    onToggleLayer?.(enabledLayers as LayerType[]);
+  };
+
+  const generateShareableUrl = () => {
+    const currentUrl = window.location.href.split('?')[0]; // Get current URL without query parameters
+    return `${currentUrl}?cities=${objectToQueryString(cities)}`;
+  };
 
   return (
     <Box
@@ -132,7 +140,7 @@ const FloatingArrowMenu: React.FC<LayerMenuProps> = ({
             }}
           >
             <Tooltip
-              title="Fly over all the cities in the sideba's order"
+              title="Fly over all the cities in the sidebar's order"
               arrow
               sx={{mt: 3}}
             >
@@ -140,9 +148,9 @@ const FloatingArrowMenu: React.FC<LayerMenuProps> = ({
                 variant='contained'
                 fullWidth
                 onClick={() => {
-                  if (flyLooping) return
-                  setFlyLooping(!flyLooping)
-                  onFlyLoop?.(!flyLooping)
+                  if (flyLooping) return;
+                  setFlyLooping(!flyLooping);
+                  onFlyLoop?.(!flyLooping);
                 }}
                 disabled={cities.length < 2}
               >
@@ -150,10 +158,23 @@ const FloatingArrowMenu: React.FC<LayerMenuProps> = ({
               </Button>
             </Tooltip>
           </Box>
+
+          {/* Share Button */}
+          <CopyToClipboard text={generateShareableUrl()}>
+            <Button
+              variant='contained'
+              color='primary'
+              startIcon={<ShareIcon />}
+              fullWidth
+              sx={{mt: 2}}
+            >
+              Share
+            </Button>
+          </CopyToClipboard>
         </Paper>
       </Collapse>
     </Box>
-  )
-}
+  );
+};
 
-export default FloatingArrowMenu
+export default FloatingArrowMenu;

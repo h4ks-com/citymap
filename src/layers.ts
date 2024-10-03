@@ -1,13 +1,13 @@
-import {LayerSpecification} from 'maplibre-gl'
-import {CircleLayer, SymbolLayer} from 'react-map-gl/dist/esm/exports-maplibre'
+import {LayerSpecification} from 'maplibre-gl';
+import {CircleLayer, SymbolLayer} from 'react-map-gl/dist/esm/exports-maplibre';
 
-import {FloatingMenuLayer} from './types'
+import {FloatingMenuLayer} from './types';
 
-export type LayerType = 'dots' | 'names' | 'time' | 'temperature'
+export type LayerType = 'dots' | 'names' | 'time' | 'temperature';
 
 export interface AppLayer extends FloatingMenuLayer {
-  type: LayerType
-  spec: LayerSpecification
+  type: LayerType;
+  spec: LayerSpecification;
 }
 
 const dotsStyle: CircleLayer = {
@@ -36,7 +36,7 @@ const dotsStyle: CircleLayer = {
     ],
     'circle-stroke-opacity': 0.8,
   },
-}
+};
 
 const nameStyle: SymbolLayer = {
   id: 'labels',
@@ -56,7 +56,7 @@ const nameStyle: SymbolLayer = {
     'text-halo-color': '#ffffff',
     'text-halo-width': 1.5,
   },
-}
+};
 
 const timeLayer: SymbolLayer = {
   id: 'time',
@@ -76,7 +76,7 @@ const timeLayer: SymbolLayer = {
     'text-halo-blur': 1,
     'text-halo-width': 2,
   },
-}
+};
 
 const tempLayer: SymbolLayer = {
   id: 'temperature',
@@ -101,7 +101,7 @@ const tempLayer: SymbolLayer = {
     'text-halo-blur': 1,
     'text-halo-width': 1.5,
   },
-}
+};
 
 const appSources: AppLayer[] = [
   {
@@ -136,6 +136,6 @@ const appSources: AppLayer[] = [
     spec: tempLayer,
     toggleable: true,
   },
-]
+];
 
-export default appSources
+export default appSources;

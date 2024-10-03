@@ -5,47 +5,62 @@ import {
   DialogContent,
   DialogTitle,
   Typography,
-} from '@mui/material'
-import React, {ReactNode, createContext, useContext, useState} from 'react'
+} from '@mui/material';
+import React, {ReactNode, createContext, useContext, useState} from 'react';
+
+interface AlertOpts {
+  callback?: () => void;
+}
 
 // Define the shape of the context
 interface AlertContextProps {
-  showAlert: (message: string, title?: string) => void
+  showAlert: (message: string, title?: string, opts?: AlertOpts) => void;
 }
 
 // Create the Alert Context
-const AlertContext = createContext<AlertContextProps | undefined>(undefined)
+const AlertContext = createContext<AlertContextProps | undefined>(undefined);
 
 // Custom hook to use Alert Context
 export const useAlert = (): AlertContextProps => {
-  const context = useContext(AlertContext)
+  const context = useContext(AlertContext);
   if (!context) {
-    throw new Error('useAlert must be used within an AlertProvider')
+    throw new Error('useAlert must be used within an AlertProvider');
   }
-  return context
-}
+  return context;
+};
 
 // AlertProvider to wrap the app
-export const AlertProvider: React.FC<{children: ReactNode}> = ({children}) => {
-  const [open, setOpen] = useState(false)
-  const [alertMessage, setAlertMessage] = useState<string>('')
-  const [alertTitle, setAlertTitle] = useState<string>('')
+export const AlertProvider: React.FC<{
+  children: ReactNode;
+  onOpen: () => void;
+}> = ({children, onOpen}) => {
+  const [open, setOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState<string>('');
+  const [alertTitle, setAlertTitle] = useState<string>('');
+  const [opts, setOpts] = useState<AlertOpts>({});
 
-  const showAlert = (message: string, title: string = 'Sorry 🙁') => {
-    setAlertMessage(message)
-    setAlertTitle(title)
-    setOpen(true)
-  }
+  const showAlert = (
+    message: string,
+    title: string = 'Sorry 🙁',
+    opts?: AlertOpts,
+  ) => {
+    setAlertMessage(message);
+    setAlertTitle(title);
+    setOpts(opts || {});
+    setOpen(true);
+    onOpen();
+  };
   const handleKeyDown = (event: React.KeyboardEvent) => {
     if (event.key === 'Escape' || event.key === 'Enter') {
-      handleClose()
-      event.preventDefault()
-      event.stopPropagation()
+      handleClose();
+      event.preventDefault();
+      event.stopPropagation();
     }
-  }
+  };
   const handleClose = () => {
-    setOpen(false)
-  }
+    setOpen(false);
+    opts?.callback?.();
+  };
 
   return (
     <AlertContext.Provider value={{showAlert}}>
@@ -76,5 +91,5 @@ export const AlertProvider: React.FC<{children: ReactNode}> = ({children}) => {
         </DialogActions>
       </Dialog>
     </AlertContext.Provider>
-  )
-}
+  );
+};

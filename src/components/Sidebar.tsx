@@ -1,5 +1,5 @@
-import ClearIcon from '@mui/icons-material/Clear'
-import DeleteIcon from '@mui/icons-material/Delete'
+import ClearIcon from '@mui/icons-material/Clear';
+import DeleteIcon from '@mui/icons-material/Delete';
 import {
   Box,
   Button,
@@ -11,16 +11,16 @@ import {
   Paper,
   TextField,
   Typography,
-} from '@mui/material'
-import React, {useState} from 'react'
+} from '@mui/material';
+import React, {useState} from 'react';
 
-import {geocodeCityName} from '../apis'
-import {CityManagerProps} from '../types'
-import {useAlert} from './AlertContext'
+import {geocodeCityName} from '../apis';
+import {CityManagerProps} from '../types';
+import {useAlert} from './AlertContext';
 
 interface SidebarProps extends CityManagerProps {
-  isSidebarCollapsed: boolean
-  setIsSidebarCollapsed: (isCollapsed: boolean) => void
+  isSidebarCollapsed: boolean;
+  setIsSidebarCollapsed: (isCollapsed: boolean) => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
@@ -29,36 +29,36 @@ const Sidebar: React.FC<SidebarProps> = ({
   onRemoveCity,
   onCityClick,
 }) => {
-  const [cityInput, setCityInput] = useState('')
-  const {showAlert} = useAlert()
+  const [cityInput, setCityInput] = useState('');
+  const {showAlert} = useAlert();
 
   const handleAddCity = async () => {
-    if (!cityInput) return
-    const newCity = await geocodeCityName(cityInput)
+    if (!cityInput) return;
+    const newCity = await geocodeCityName(cityInput);
     if (newCity) {
-      setCityInput('')
-      onAddCity?.(newCity)
+      setCityInput('');
+      onAddCity?.(newCity);
     } else {
-      showAlert('City not found!')
+      showAlert('City not found!');
     }
-  }
+  };
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
     if (event.key === 'Enter') {
-      handleAddCity()
+      handleAddCity();
     }
-  }
+  };
 
-  const isSearching = () => cityInput.length >= 3
+  const isSearching = () => cityInput.length >= 3;
   const displayCities = cities.filter(city =>
     isSearching()
       ? city.name.toLowerCase().trim().includes(cityInput.toLowerCase().trim())
       : true,
-  )
+  );
 
   const highlightText = (text: string, highlight: string) => {
-    if (!isSearching()) return text
-    const parts = text.split(new RegExp(`(${highlight})`, 'gi'))
+    if (!isSearching()) return text;
+    const parts = text.split(new RegExp(`(${highlight})`, 'gi'));
     return (
       <span>
         {parts.map((part, index) =>
@@ -75,8 +75,8 @@ const Sidebar: React.FC<SidebarProps> = ({
           ),
         )}
       </span>
-    )
-  }
+    );
+  };
 
   return (
     <Paper
@@ -171,7 +171,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         ))}
       </List>
     </Paper>
-  )
-}
+  );
+};
 
-export default Sidebar
+export default Sidebar;

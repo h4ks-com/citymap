@@ -1,28 +1,28 @@
-import type {FeatureCollection} from 'geojson'
-import {Feature, Point} from 'geojson'
-import {MapLibreEvent} from 'maplibre-gl'
-import 'maplibre-gl/dist/maplibre-gl.css'
-import React, {useEffect, useRef, useState} from 'react'
-import Map, {Layer, Source} from 'react-map-gl/maplibre'
+import type {FeatureCollection} from 'geojson';
+import {Feature, Point} from 'geojson';
+import {MapLibreEvent} from 'maplibre-gl';
+import 'maplibre-gl/dist/maplibre-gl.css';
+import React, {useEffect, useRef, useState} from 'react';
+import Map, {Layer, Source} from 'react-map-gl/maplibre';
 
-import {CityFields, cityFieldsFromLayers, reverseGeocodeCity} from '../apis'
-import appSources, {LayerType} from '../layers'
-import {City, CityHelper, CityManagerProps} from '../types'
-import {useAlert} from './AlertContext'
+import {CityFields, cityFieldsFromLayers, reverseGeocodeCity} from '../apis';
+import appSources, {LayerType} from '../layers';
+import {City, CityHelper, CityManagerProps} from '../types';
+import {useAlert} from './AlertContext';
 
 interface LayerProperties {
-  identifier: string
-  name: string
-  time: string
-  temperature: number | undefined
+  identifier: string;
+  name: string;
+  time: string;
+  temperature: number | undefined;
 }
 
 function createPointFeatureFromCity(
   city: City,
   cityFields: Set<CityFields>,
 ): Feature<Point, LayerProperties> {
-  const helper = new CityHelper(city)
-  const id = helper.id()
+  const helper = new CityHelper(city);
+  const id = helper.id();
   return {
     type: 'Feature',
     geometry: {
@@ -36,7 +36,7 @@ function createPointFeatureFromCity(
       temperature: cityFields.has('temperature') ? city.temperature : undefined,
     },
     id: id,
-  }
+  };
 }
 
 const createGeoJSONData = (
@@ -46,13 +46,13 @@ const createGeoJSONData = (
   return {
     type: 'FeatureCollection',
     features: cities.map(city => createPointFeatureFromCity(city, cityFields)),
-  }
-}
+  };
+};
 
 interface MapComponentProps extends CityManagerProps {
-  enabledLayers: LayerType[]
-  onMapLoad?: (map: maplibregl.Map) => void
-  hide?: boolean
+  enabledLayers: LayerType[];
+  onMapLoad?: (map: maplibregl.Map) => void;
+  hide?: boolean;
 }
 
 const MapContainer: React.FC<MapComponentProps> = ({
@@ -63,29 +63,29 @@ const MapContainer: React.FC<MapComponentProps> = ({
   onMapLoad,
   hide,
 }) => {
-  const cityFields: Set<CityFields> = cityFieldsFromLayers(enabledLayers)
-  const [geojson, setGeojson] = useState(createGeoJSONData([], cityFields))
-  const {showAlert} = useAlert()
-  const map = useRef<maplibregl.Map>()
+  const cityFields: Set<CityFields> = cityFieldsFromLayers(enabledLayers);
+  const [geojson, setGeojson] = useState(createGeoJSONData([], cityFields));
+  const {showAlert} = useAlert();
+  const map = useRef<maplibregl.Map>();
 
-  const layers = appSources.filter(layer => enabledLayers.includes(layer.type))
+  const layers = appSources.filter(layer => enabledLayers.includes(layer.type));
 
   useEffect(() => {
-    setGeojson(createGeoJSONData(cities, cityFields))
+    setGeojson(createGeoJSONData(cities, cityFields));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cities, enabledLayers])
+  }, [cities, enabledLayers]);
 
   // If time is shown, update every time
   useEffect(() => {
-    let timer: NodeJS.Timeout
+    let timer: NodeJS.Timeout;
     if (cityFields.has('timezone')) {
       timer = setInterval(() => {
-        setGeojson(createGeoJSONData(cities, cityFields))
-      }, 10000)
+        setGeojson(createGeoJSONData(cities, cityFields));
+      }, 10000);
     }
-    return () => clearInterval(timer)
+    return () => clearInterval(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cities, cityFields])
+  }, [cities, cityFields]);
 
   return (
     <Map
@@ -98,51 +98,51 @@ const MapContainer: React.FC<MapComponentProps> = ({
         display: hide ? 'none' : 'block',
       }}
       onLoad={(e: MapLibreEvent) => {
-        if (!e.target) return
-        map.current = e.target as unknown as maplibregl.Map
-        onMapLoad?.(map.current)
+        if (!e.target) return;
+        map.current = e.target as unknown as maplibregl.Map;
+        onMapLoad?.(map.current);
       }}
       mapStyle={`${process.env.PUBLIC_URL}/style.json`}
       onContextMenu={async event => {
-        event.preventDefault()
-        const {lng, lat} = event.lngLat
-        const city = await reverseGeocodeCity(lat, lng)
+        event.preventDefault();
+        const {lng, lat} = event.lngLat;
+        const city = await reverseGeocodeCity(lat, lng);
         if (!city) {
-          showAlert('Could not find city at this location')
-          return
+          showAlert('Could not find city at this location');
+          return;
         }
-        onAddCity?.(city)
+        onAddCity?.(city);
       }}
       onClick={event => {
-        const features = event.features
-        if (!features?.length) return
+        const features = event.features;
+        if (!features?.length) return;
         const city = cities.find(
           city => new CityHelper(city).id() === features[0].id,
-        )
+        );
         if (city) {
-          onCityClick?.(city)
+          onCityClick?.(city);
         }
       }}
       onMouseMove={event => {
-        const features = event.features
-        if (!features?.length) return
-        if (map.current) map.current.getCanvas().style.cursor = 'pointer'
+        const features = event.features;
+        if (!features?.length) return;
+        if (map.current) map.current.getCanvas().style.cursor = 'pointer';
         for (const feature of features) {
           map.current?.setFeatureState(
             {id: feature.id, source: 'dots'},
             {hover: true},
-          )
+          );
         }
       }}
       onMouseLeave={event => {
-        const features = event.features
-        if (!features?.length) return
-        if (map.current) map.current.getCanvas().style.cursor = 'grab'
+        const features = event.features;
+        if (!features?.length) return;
+        if (map.current) map.current.getCanvas().style.cursor = 'grab';
         for (const feature of features) {
           map.current?.setFeatureState(
             {id: feature.id, source: 'dots'},
             {hover: false},
-          )
+          );
         }
       }}
       interactiveLayerIds={['point']}
@@ -158,10 +158,10 @@ const MapContainer: React.FC<MapComponentProps> = ({
           >
             <Layer {...layer.spec} />
           </Source>
-        )
+        );
       })}
     </Map>
-  )
-}
+  );
+};
 
-export default MapContainer
+export default MapContainer;

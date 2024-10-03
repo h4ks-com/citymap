@@ -1,12 +1,12 @@
-import ArrowBackIcon from '@mui/icons-material/ArrowBack'
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
-import {IconButton, SxProps} from '@mui/material'
-import React from 'react'
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import {IconButton, SxProps} from '@mui/material';
+import React from 'react';
 
 interface FabProps {
-  isCollapsed: boolean
-  onClick: () => void
-  sx?: SxProps
+  isCollapsed: boolean;
+  onClick: () => void;
+  sx?: SxProps;
 }
 
 const FloatingArrowSidebar: React.FC<FabProps> = ({
@@ -30,7 +30,7 @@ const FloatingArrowSidebar: React.FC<FabProps> = ({
     >
       {isCollapsed ? <ArrowForwardIcon /> : <ArrowBackIcon />}
     </IconButton>
-  )
-}
+  );
+};
 
-export default FloatingArrowSidebar
+export default FloatingArrowSidebar;
