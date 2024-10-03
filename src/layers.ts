@@ -1,12 +1,13 @@
-import {LayerSpecification} from "maplibre-gl";
-import {CircleLayer, SymbolLayer} from "react-map-gl/dist/esm/exports-maplibre";
-import {FloatingMenuLayer} from "./types";
+import {LayerSpecification} from 'maplibre-gl'
+import {CircleLayer, SymbolLayer} from 'react-map-gl/dist/esm/exports-maplibre'
 
-export type LayerType = 'dots' | 'names' | 'time' | 'temperature';
+import {FloatingMenuLayer} from './types'
+
+export type LayerType = 'dots' | 'names' | 'time' | 'temperature'
 
 export interface AppLayer extends FloatingMenuLayer {
-  type: LayerType;
-  spec: LayerSpecification;
+  type: LayerType
+  spec: LayerSpecification
 }
 
 const dotsStyle: CircleLayer = {
@@ -15,16 +16,16 @@ const dotsStyle: CircleLayer = {
   source: 'circle',
   paint: {
     'circle-radius': 8,
-    'circle-color': '#cc1236dd'
-  }
-};
+    'circle-color': '#cc1236dd',
+  },
+}
 
 const nameStyle: SymbolLayer = {
   id: 'labels',
   type: 'symbol',
   source: 'circle',
   layout: {
-    'text-font': ["Times New Roman Bold"],
+    'text-font': ['Times New Roman Bold'],
     'text-field': ['get', 'name'],
     'text-variable-anchor': ['bottom'],
     'text-radial-offset': 1,
@@ -35,15 +36,15 @@ const nameStyle: SymbolLayer = {
     'text-color': '#000000',
     'text-halo-color': '#ffffff',
     'text-halo-width': 2,
-  }
-};
+  },
+}
 
 const timeLayer: SymbolLayer = {
   id: 'time',
   type: 'symbol',
   source: 'circle',
   layout: {
-    'text-font': ["Nunito Semi Bold"],
+    'text-font': ['Nunito Semi Bold'],
     'text-field': ['get', 'time'],
     'text-variable-anchor': ['top'],
     'text-radial-offset': 1,
@@ -54,28 +55,32 @@ const timeLayer: SymbolLayer = {
     'text-color': '#111111',
     'text-halo-color': '#ffffff',
     'text-halo-width': 1.5,
-  }
-};
+  },
+}
 
 const tempLayer: SymbolLayer = {
   id: 'temperature',
   type: 'symbol',
   source: 'circle',
   layout: {
-    'text-font': ["Nunito Semi Bold"],
-    'text-field': ['concat', ["coalesce", ['get', 'temperature'], "(?)"], "C"],
+    'text-font': ['Nunito Semi Bold'],
+    'text-field': ['concat', ['coalesce', ['get', 'temperature'], '(?)'], 'C'],
     'text-variable-anchor': ['left'],
     'text-radial-offset': 2,
     'text-justify': 'auto',
     'text-size': 14,
   },
   paint: {
-    'text-color': ["case", ["<", ["coalesce", ['get', 'temperature'], 0], 21], '#0000ff', '#ff0000'],
+    'text-color': [
+      'case',
+      ['<', ['coalesce', ['get', 'temperature'], 0], 21],
+      '#0000ff',
+      '#ff0000',
+    ],
     'text-halo-color': '#ffffff',
     'text-halo-width': 1.0,
-  }
-};
-
+  },
+}
 
 const appLayers: AppLayer[] = [
   {
@@ -112,4 +117,4 @@ const appLayers: AppLayer[] = [
   },
 ]
 
-export default appLayers;
+export default appLayers

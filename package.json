@@ -29,7 +29,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "prepare": "husky",
+    "lint": "prettier --write src/**/*.{ts,tsx} && eslint src/**/*.{ts,tsx} --fix"
   },
   "eslintConfig": {
     "extends": [
@@ -50,11 +52,15 @@
     ]
   },
   "devDependencies": {
+    "@trivago/prettier-plugin-sort-imports": "^4.3.0",
     "@types/crypto-js": "^4.2.2",
     "assert": "^2.1.0",
     "buffer": "^6.0.3",
     "https-browserify": "^1.0.0",
+    "husky": "^9.1.6",
+    "lint-staged": "^15.2.10",
     "os-browserify": "^0.3.0",
+    "prettier": "^3.3.3",
     "process": "^0.11.10",
     "react-app-rewired": "^2.2.1",
     "stream-browserify": "^3.0.0",
