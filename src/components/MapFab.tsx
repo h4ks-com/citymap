@@ -63,7 +63,6 @@ const FloatingArrowMenu: React.FC<LayerMenuProps> = ({
         display: 'flex',
         flexDirection: 'column', // Align button and dropdown vertically
         alignItems: 'center',
-        zIndex: 1000,
       }}
     >
       {/* Arrow Button */}

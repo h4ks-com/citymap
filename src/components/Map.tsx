@@ -51,6 +51,7 @@ const createGeoJSONData = (
 interface MapComponentProps extends CityManagerProps {
   enabledLayers: LayerType[]
   onMapLoad?: (map: maplibregl.Map) => void
+  hide?: boolean
 }
 
 const MapContainer: React.FC<MapComponentProps> = ({
@@ -59,6 +60,7 @@ const MapContainer: React.FC<MapComponentProps> = ({
   onAddCity,
   onCityClick,
   onMapLoad,
+  hide,
 }) => {
   const cityFields: Set<CityFields> = cityFieldsFromLayers(enabledLayers)
   const [geojson, setGeojson] = useState(createGeoJSONData([], cityFields))
@@ -90,13 +92,15 @@ const MapContainer: React.FC<MapComponentProps> = ({
         latitude: 0,
         zoom: 1,
       }}
+      style={{
+        display: hide ? 'none' : 'block',
+      }}
       onLoad={(e: MapLibreEvent) => {
         if (!e.target) return
         map.current = e.target as unknown as maplibregl.Map
         onMapLoad?.(map.current)
       }}
       mapStyle={`${process.env.PUBLIC_URL}/style.json`}
-      style={{width: '80vw', height: '100vh'}}
       onContextMenu={async event => {
         event.preventDefault()
         const {lng, lat} = event.lngLat

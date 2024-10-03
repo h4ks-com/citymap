@@ -17,7 +17,12 @@ import React, {useState} from 'react'
 import {geocodeCityName} from '../apis'
 import {CityManagerProps} from '../types'
 
-const Sidebar: React.FC<CityManagerProps> = ({
+interface SidebarProps extends CityManagerProps {
+  isSidebarCollapsed: boolean
+  setIsSidebarCollapsed: (isCollapsed: boolean) => void
+}
+
+const Sidebar: React.FC<SidebarProps> = ({
   cities,
   onAddCity,
   onRemoveCity,
@@ -76,6 +81,7 @@ const Sidebar: React.FC<CityManagerProps> = ({
       elevation={3}
       sx={{
         height: '100%',
+        width: '100%',
         padding: 2,
         display: 'flex',
         flexDirection: 'column',

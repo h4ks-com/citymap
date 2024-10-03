@@ -5,12 +5,6 @@
   overflow: hidden;
 }
 
-.sidebar-container {
-  width: 25vw;
-  min-width: 300px;
-  box-sizing: border-box;
-}
-
 .map-container {
   flex-grow: 1;
   height: 100vh;
@@ -26,6 +20,25 @@
   border-radius: 50%;
 }
 
+.MuiCollapse-wrapperInner {
+  overflow: scroll;
+  width: 100% !important;
+}
+
 ::-webkit-scrollbar {
   display: none;
+}
+
+@media only screen and (max-width: 600px) {
+  .sidebar-container {
+    width: 100vw;
+    height: 100vh;
+    min-width: 0;
+  }
+
+  .map-container {
+    width: 100vw;
+    height: 100vh;
+    position: absolute;
+  }
 }
