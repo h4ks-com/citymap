@@ -8,6 +8,7 @@ import Map, {Layer, Source} from 'react-map-gl/maplibre'
 import {CityFields, cityFieldsFromLayers, reverseGeocodeCity} from '../apis'
 import appSources, {LayerType} from '../layers'
 import {City, CityHelper, CityManagerProps} from '../types'
+import {useAlert} from './AlertContext'
 
 interface LayerProperties {
   identifier: string
@@ -64,6 +65,7 @@ const MapContainer: React.FC<MapComponentProps> = ({
 }) => {
   const cityFields: Set<CityFields> = cityFieldsFromLayers(enabledLayers)
   const [geojson, setGeojson] = useState(createGeoJSONData([], cityFields))
+  const {showAlert} = useAlert()
   const map = useRef<maplibregl.Map>()
 
   const layers = appSources.filter(layer => enabledLayers.includes(layer.type))
@@ -106,7 +108,7 @@ const MapContainer: React.FC<MapComponentProps> = ({
         const {lng, lat} = event.lngLat
         const city = await reverseGeocodeCity(lat, lng)
         if (!city) {
-          alert('Could not find city at this location')
+          showAlert('Could not find city at this location')
           return
         }
         onAddCity?.(city)

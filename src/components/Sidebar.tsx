@@ -16,6 +16,7 @@ import React, {useState} from 'react'
 
 import {geocodeCityName} from '../apis'
 import {CityManagerProps} from '../types'
+import {useAlert} from './AlertContext'
 
 interface SidebarProps extends CityManagerProps {
   isSidebarCollapsed: boolean
@@ -29,6 +30,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   onCityClick,
 }) => {
   const [cityInput, setCityInput] = useState('')
+  const {showAlert} = useAlert()
 
   const handleAddCity = async () => {
     if (!cityInput) return
@@ -37,7 +39,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       setCityInput('')
       onAddCity?.(newCity)
     } else {
-      alert('City not found!')
+      showAlert('City not found!')
     }
   }
 

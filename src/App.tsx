@@ -11,6 +11,7 @@ import {
   batchFetchPopulateCityData,
   cityFieldsFromLayers,
 } from './apis'
+import {AlertProvider} from './components/AlertContext'
 import MapContainer from './components/Map'
 import FloatingArrowMenu from './components/MapFab'
 import Sidebar from './components/Sidebar'
@@ -108,71 +109,77 @@ function App() {
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
       <div className='app'>
-        <div style={{zIndex: 1000}}>
-          <FloatingArrowMenu
-            layers={appSources}
-            enabledLayers={enabledLayers}
-            onToggleEvent={layers => {
-              setEnabledLayers(layers)
-              updateCityData(cities)
-            }}
-          />
-        </div>
-        <div style={{zIndex: 3000}}>
-          <FloatingArrowSidebar
-            isCollapsed={isSidebarCollapsed}
-            onClick={() => {
-              setIsSidebarCollapsed(!isSidebarCollapsed)
-            }}
+        <AlertProvider>
+          <div style={{zIndex: 1000}}>
+            <FloatingArrowMenu
+              layers={appSources}
+              enabledLayers={enabledLayers}
+              onToggleEvent={layers => {
+                setEnabledLayers(layers)
+                updateCityData(cities)
+              }}
+            />
+          </div>
+          <div style={{zIndex: 3000}}>
+            <FloatingArrowSidebar
+              isCollapsed={isSidebarCollapsed}
+              onClick={() => {
+                setIsSidebarCollapsed(!isSidebarCollapsed)
+              }}
+              sx={{
+                left: isSidebarCollapsed
+                  ? '16px'
+                  : isHighWidth
+                    ? '18vw'
+                    : '90vw',
+              }}
+            />
+          </div>
+          <Collapse
+            in={!isSidebarCollapsed}
+            orientation='horizontal'
+            className='sidebar-container'
             sx={{
-              left: isSidebarCollapsed ? '16px' : isHighWidth ? '18vw' : '90vw',
+              transition: 'width 0.3s',
+              width: isSidebarCollapsed
+                ? '0px'
+                : isHighWidth
+                  ? '30vw!important'
+                  : '100vw!important',
+              minWidth: '300px',
+              height: '100vh',
+              zIndex: 2000,
             }}
-          />
-        </div>
-        <Collapse
-          in={!isSidebarCollapsed}
-          orientation='horizontal'
-          className='sidebar-container'
-          sx={{
-            transition: 'width 0.3s',
-            width: isSidebarCollapsed
-              ? '0px'
-              : isHighWidth
-                ? '30vw!important'
-                : '100vw!important',
-            minWidth: '300px',
-            height: '100vh',
-            zIndex: 2000,
-          }}
-          unmountOnExit
-        >
-          <Sidebar
-            cities={cities}
-            onAddCity={handleAddCity}
-            onRemoveCity={handleRemoveCity}
-            onCityClick={city => {
-              // if mobile, we collapse the sidebar
-              if (!isHighWidth) {
-                setIsSidebarCollapsed(true)
-              }
-              flyToCity(city)
-            }}
-            isSidebarCollapsed={isSidebarCollapsed}
-            setIsSidebarCollapsed={setIsSidebarCollapsed}
-          />
-        </Collapse>
-        <div className='map-container' style={{zIndex: 0}}>
-          <MapContainer
-            cities={cities}
-            onCityClick={flyToCity}
-            enabledLayers={enabledLayers}
-            onAddCity={handleAddCity}
-            onMapLoad={loadedMap => {
-              map.current = loadedMap
-            }}
-            hide={!isSidebarCollapsed && !isHighWidth}
-          />
-        </div>
+            unmountOnExit
+          >
+            <Sidebar
+              cities={cities}
+              onAddCity={handleAddCity}
+              onRemoveCity={handleRemoveCity}
+              onCityClick={city => {
+                // if mobile, we collapse the sidebar
+                if (!isHighWidth) {
+                  setIsSidebarCollapsed(true)
+                }
+                flyToCity(city)
+              }}
+              isSidebarCollapsed={isSidebarCollapsed}
+              setIsSidebarCollapsed={setIsSidebarCollapsed}
+            />
+          </Collapse>
+          <div className='map-container' style={{zIndex: 0}}>
+            <MapContainer
+              cities={cities}
+              onCityClick={flyToCity}
+              enabledLayers={enabledLayers}
+              onAddCity={handleAddCity}
+              onMapLoad={loadedMap => {
+                map.current = loadedMap
+              }}
+              hide={!isSidebarCollapsed && !isHighWidth}
+            />
+          </div>
+        </AlertProvider>
       </div>
     </ThemeProvider>
   )
