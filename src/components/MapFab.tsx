@@ -6,8 +6,11 @@ import {
   Box,
   Button,
   Collapse,
+  FormControlLabel,
   IconButton,
   Paper,
+  Radio,
+  RadioGroup,
   Switch,
   Tooltip,
   Typography,
@@ -15,7 +18,7 @@ import {
 import React, {useState} from 'react';
 import {CopyToClipboard} from 'react-copy-to-clipboard';
 
-import appSources, {LayerType, appMapStyles} from '../layers';
+import appSources, {LayerType} from '../layers';
 import {objectToQueryString} from '../storage';
 import {City, FloatingMenuLayer} from '../types';
 
@@ -42,7 +45,7 @@ const FloatingArrowMenu: React.FC<LayerMenuProps> = ({
   const [flyLooping, setFlyLooping] = useState<boolean>(false);
   const [copied, setCopied] = useState<boolean>(false);
 
-  const [sourceSwitchStates, setSourcecSwitchStates] = useState<{
+  const [sourceSwitchStates, setSourceSwitchStates] = useState<{
     [key: string]: boolean;
   }>(
     sources.reduce(
@@ -58,24 +61,13 @@ const FloatingArrowMenu: React.FC<LayerMenuProps> = ({
     ),
   );
 
-  // styles are similar to layers but only one can be active at a time
-  const [styleSwitchStates, setStyleSwitchStates] = useState<{
-    [key: string]: boolean;
-  }>(
-    styles.reduce(
-      (acc, style) => {
-        if (
-          appMapStyles.filter(source => source.type === style.type).length === 0
-        )
-          return acc;
-        acc[style.type] = enabledLayers.includes(style.type);
-        return acc;
-      },
-      {} as {[key: string]: boolean},
-    ),
+  const [selectedStyle, setSelectedStyle] = useState<string>(
+    styles.find(style => enabledLayers.includes(style.type))?.type || 'default',
   );
 
-  const handleSwitchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSourceSwitchChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     const newSwitchState = {
       ...sourceSwitchStates,
       [event.target.id]: event.target.checked,
@@ -86,44 +78,20 @@ const FloatingArrowMenu: React.FC<LayerMenuProps> = ({
         delete newSwitchState[key];
       }
     }
-    setSourcecSwitchStates(newSwitchState);
+    setSourceSwitchStates(newSwitchState);
 
-    const layers = {...styleSwitchStates, ...newSwitchState};
+    const layers = {...newSwitchState, [selectedStyle]: true};
     const enabledLayers = Object.entries(layers)
       .filter(([, enabled]) => enabled)
       .map(([name]) => name);
     onToggleLayer?.(enabledLayers as LayerType[]);
   };
 
-  const handleStyleSwitchChange = (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    // Only one style can be active at a time
-    let newSwitchState = {
-      [event.target.id]: event.target.checked,
-    };
-    // If default is being disabled, we activate the second style
-    if (event.target.id === 'default' && !event.target.checked) {
-      newSwitchState = {
-        satellite: true,
-      };
-    }
-    console.log(newSwitchState);
-    // If no style is active, we activate the default one
-    if (Object.values(newSwitchState).every(value => !value)) {
-      newSwitchState = {
-        default: true,
-      };
-    }
-    // Only keep appMapStyles
-    for (const key in newSwitchState) {
-      if (appMapStyles.filter(source => source.type === key).length === 0) {
-        delete newSwitchState[key];
-      }
-    }
-    setStyleSwitchStates(newSwitchState);
+  const handleStyleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newStyle = event.target.value;
+    setSelectedStyle(newStyle);
 
-    const layers = {...sourceSwitchStates, ...newSwitchState};
+    const layers = {...sourceSwitchStates, [newStyle]: true};
     const enabledLayers = Object.entries(layers)
       .filter(([, enabled]) => enabled)
       .map(([name]) => name);
@@ -184,48 +152,54 @@ const FloatingArrowMenu: React.FC<LayerMenuProps> = ({
                   display: 'flex',
                   flexDirection: 'row',
                   alignItems: 'center',
-                  mb: 1,
                 }}
               >
-                <Tooltip title={layer.description} arrow>
-                  <Switch
-                    checked={sourceSwitchStates[layer.type]}
-                    onChange={handleSwitchChange}
-                    name={layer.name}
-                    id={layer.type}
-                  />
+                <Tooltip title={layer.description} arrow placement='left'>
+                  <Box>
+                    <Switch
+                      checked={sourceSwitchStates[layer.type]}
+                      onChange={handleSourceSwitchChange}
+                      name={layer.name}
+                      id={layer.type}
+                    />
+                    <Typography variant='caption' sx={{ml: 1}}>
+                      {layer.name}
+                    </Typography>
+                  </Box>
                 </Tooltip>
-                <Typography variant='caption' sx={{ml: 1}}>
-                  {layer.name}
-                </Typography>
               </Box>
             ))}
           <Box sx={{height: 8}} />
-          {styles
-            .filter(style => style.toggleable)
-            .map(style => (
-              <Box
-                key={style.name}
-                sx={{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  mb: 1,
-                }}
-              >
-                <Tooltip title={style.description} arrow>
-                  <Switch
-                    checked={styleSwitchStates[style.type]}
-                    onChange={handleStyleSwitchChange}
-                    name={style.name}
-                    id={style.type}
-                  />
-                </Tooltip>
-                <Typography variant='caption' sx={{ml: 1}}>
-                  {style.name}
-                </Typography>
-              </Box>
-            ))}
+          <RadioGroup
+            name='styles'
+            value={selectedStyle}
+            onChange={handleStyleChange}
+            sx={{ml: 2}}
+          >
+            {styles
+              .filter(style => style.toggleable)
+              .map(style => (
+                <Box
+                  key={style.name}
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                  }}
+                >
+                  <Tooltip title={style.description} arrow placement='left'>
+                    <FormControlLabel
+                      value={style.type}
+                      control={<Radio />}
+                      label={
+                        <Typography variant='caption'>{style.name}</Typography>
+                      }
+                    />
+                  </Tooltip>
+                </Box>
+              ))}
+          </RadioGroup>
+
           <Box
             key='loop'
             sx={{
@@ -238,6 +212,7 @@ const FloatingArrowMenu: React.FC<LayerMenuProps> = ({
             <Tooltip
               title="Fly over all the cities in the sidebar's order"
               arrow
+              placement='left'
               sx={{mt: 3}}
             >
               <Button
@@ -257,33 +232,45 @@ const FloatingArrowMenu: React.FC<LayerMenuProps> = ({
 
           {/* Share Button with Copy Feedback */}
           <CopyToClipboard text={generateShareableUrl()} onCopy={handleCopy}>
+            <Tooltip
+              title='Get a shareable URL for a temporary app with the current cities'
+              arrow
+              placement='left'
+            >
+              <Button
+                variant='contained'
+                color={copied ? 'success' : 'primary'}
+                startIcon={<ShareIcon />}
+                fullWidth
+                sx={{
+                  mt: 2,
+                  transition: 'background-color 0.3s ease',
+                }}
+              >
+                {copied ? 'Copied!' : 'Share'}
+              </Button>
+            </Tooltip>
+          </CopyToClipboard>
+          {/* Map Screenshot. Save map as an image */}
+          <Tooltip
+            title='Save the current map view as an image'
+            arrow
+            placement='left'
+          >
             <Button
               variant='contained'
-              color={copied ? 'success' : 'primary'}
-              startIcon={<ShareIcon />}
+              color='primary'
+              startIcon={<SaveAltIcon />}
               fullWidth
+              onClick={onSaveMap}
               sx={{
                 mt: 2,
                 transition: 'background-color 0.3s ease',
               }}
             >
-              {copied ? 'Copied!' : 'Share'}
+              Save View
             </Button>
-          </CopyToClipboard>
-          {/* Map Screenshot. Save map as a image */}
-          <Button
-            variant='contained'
-            color='primary'
-            startIcon={<SaveAltIcon />}
-            fullWidth
-            onClick={onSaveMap}
-            sx={{
-              mt: 2,
-              transition: 'background-color 0.3s ease',
-            }}
-          >
-            Save Map
-          </Button>
+          </Tooltip>
         </Paper>
       </Collapse>
     </Box>

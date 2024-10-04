@@ -179,7 +179,6 @@ const Sidebar: React.FC<SidebarProps> = ({
               </IconButton>
             }
           >
-            {/* Make city name clickable by attaching onClick */}
             <ListItemText
               primary={
                 <Box

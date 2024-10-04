@@ -9,6 +9,10 @@ export type LayerType =
   | 'time'
   | 'temperature'
   | 'satellite'
+  | 'political'
+  | 'ocean'
+  | 'landscape'
+  | 'osm'
   | 'default';
 
 export interface AppLayer extends FloatingMenuLayer {
@@ -20,6 +24,8 @@ export interface AppMapStyle extends FloatingMenuLayer {
   type: LayerType;
   style: string;
 }
+
+const MAPTILER_KEY = 'OVCTzuFLwqkHSOwHpV5x';
 
 const dotsStyle: CircleLayer = {
   id: 'point',
@@ -159,13 +165,44 @@ const appMapStyles: AppMapStyle[] = [
     style: `${process.env.PUBLIC_URL}/style.json`,
   },
   {
+    type: 'political',
+    name: 'Political',
+    description: 'Political map view',
+    defaultToggled: false,
+    toggleable: true,
+    style: `https://api.maptiler.com/maps/streets/style.json?key=${MAPTILER_KEY}`,
+  },
+  {
     type: 'satellite',
     name: 'Satellite',
     description: 'Satellite imagery view',
     defaultToggled: false,
     toggleable: true,
-    style:
-      'https://api.maptiler.com/maps/hybrid/style.json?key=OVCTzuFLwqkHSOwHpV5x',
+    style: `https://api.maptiler.com/maps/hybrid/style.json?key=${MAPTILER_KEY}`,
+  },
+  {
+    type: 'landscape',
+    name: 'Landscape',
+    description: 'Landscape map view',
+    defaultToggled: false,
+    toggleable: true,
+    style: `https://api.maptiler.com/maps/landscape/style.json?key=${MAPTILER_KEY}`,
+  },
+  {
+    type: 'osm',
+    name: 'OpenStreetMap',
+    description: 'OpenStreetMap view',
+    defaultToggled: false,
+    toggleable: true,
+    style: `https://api.maptiler.com/maps/openstreetmap/style.json?key=${MAPTILER_KEY}`,
+  },
+  {
+    type: 'ocean',
+    name: 'Ocean',
+    description: 'Oceanic map view',
+    defaultToggled: false,
+    toggleable: true,
+    style: `https://api.maptiler.com/maps/ocean/style.json?key=${MAPTILER_KEY}`,
   },
 ];
 
