@@ -10,6 +10,7 @@ import React, {ReactNode, createContext, useContext, useState} from 'react';
 
 interface AlertOpts {
   callback?: () => void;
+  triggerOnOpen?: boolean;
 }
 
 // Define the shape of the context
@@ -48,7 +49,9 @@ export const AlertProvider: React.FC<{
     setAlertTitle(title);
     setOpts(opts || {});
     setOpen(true);
-    onOpen();
+    if (opts?.triggerOnOpen) {
+      onOpen();
+    }
   };
   const handleKeyDown = (event: React.KeyboardEvent) => {
     if (event.key === 'Escape' || event.key === 'Enter') {

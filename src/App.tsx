@@ -44,6 +44,7 @@ const ErrorWrapper: React.FC<ErrorWrapperProps> = ({attempt}) => {
             window.history.pushState({}, '', '/');
             window.location.reload();
           },
+          triggerOnOpen: true,
         },
       );
     }
