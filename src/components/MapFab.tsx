@@ -1,5 +1,6 @@
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
+import SaveAltIcon from '@mui/icons-material/SaveAlt';
 import ShareIcon from '@mui/icons-material/Share';
 import {
   Box,
@@ -23,6 +24,7 @@ interface LayerMenuProps {
   styles: FloatingMenuLayer[];
   enabledLayers: string[];
   onToggleEvent?: (enabledLayers: LayerType[]) => void;
+  onSaveMap?: () => void;
   onFlyLoop?: (flyLooping: boolean) => void;
   cities: City[];
 }
@@ -34,6 +36,7 @@ const FloatingArrowMenu: React.FC<LayerMenuProps> = ({
   onToggleEvent: onToggleLayer,
   onFlyLoop,
   cities,
+  onSaveMap,
 }) => {
   const [open, setOpen] = useState<boolean>(false);
   const [flyLooping, setFlyLooping] = useState<boolean>(false);
@@ -267,6 +270,20 @@ const FloatingArrowMenu: React.FC<LayerMenuProps> = ({
               {copied ? 'Copied!' : 'Share'}
             </Button>
           </CopyToClipboard>
+          {/* Map Screenshot. Save map as a image */}
+          <Button
+            variant='contained'
+            color='primary'
+            startIcon={<SaveAltIcon />}
+            fullWidth
+            onClick={onSaveMap}
+            sx={{
+              mt: 2,
+              transition: 'background-color 0.3s ease',
+            }}
+          >
+            Save Map
+          </Button>
         </Paper>
       </Collapse>
     </Box>

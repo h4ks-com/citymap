@@ -153,6 +153,13 @@ const Main: React.FC<AppProps> = ({StorageClass}) => {
             setEnabledLayers(layers);
             updateCityData(cities);
           }}
+          onSaveMap={async () => {
+            if (!map.current) return;
+            var pseudolink = document.createElement('a');
+            pseudolink.href = map.current.getCanvas().toDataURL();
+            pseudolink.download = 'cities.png';
+            pseudolink.click();
+          }}
           onFlyLoop={t => {
             if (t) {
               setFlyLoopState({

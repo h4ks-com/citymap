@@ -151,6 +151,7 @@ const MapContainer: React.FC<MapComponentProps> = ({
         }
       }}
       interactiveLayerIds={['point']}
+      preserveDrawingBuffer
     >
       {appSources
         .filter(layer => enabledLayers.includes(layer.type))
