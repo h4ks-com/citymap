@@ -106,7 +106,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           Cities
         </Typography>
         <Tooltip
-          title='Collapse Sidebar'
+          title='Hide Sidebar'
           arrow
           sx={{mb: 2}}
           PopperProps={{style: {zIndex: 10000}}}

@@ -53,6 +53,7 @@ interface MapComponentProps extends CityManagerProps {
   enabledLayers: LayerType[];
   onMapLoad?: (map: maplibregl.Map) => void;
   hide?: boolean;
+  fullWidth?: boolean;
 }
 
 const MapContainer: React.FC<MapComponentProps> = ({
@@ -62,6 +63,7 @@ const MapContainer: React.FC<MapComponentProps> = ({
   onCityClick,
   onMapLoad,
   hide,
+  fullWidth,
 }) => {
   const cityFields: Set<CityFields> = cityFieldsFromLayers(enabledLayers);
   const [geojson, setGeojson] = useState(createGeoJSONData([], cityFields));
@@ -94,6 +96,7 @@ const MapContainer: React.FC<MapComponentProps> = ({
       }}
       style={{
         display: hide ? 'none' : 'block',
+        ...(fullWidth ? {width: '100%', position: 'fixed'} : {}),
       }}
       onLoad={(e: MapLibreEvent) => {
         if (!e.target) return;

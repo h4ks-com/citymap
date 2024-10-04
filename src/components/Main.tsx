@@ -224,6 +224,7 @@ const Main: React.FC<AppProps> = ({StorageClass}) => {
             map.current = loadedMap;
           }}
           hide={!isSidebarCollapsed && !isHighWidth}
+          fullWidth={isSidebarCollapsed}
         />
       </div>
     </div>
