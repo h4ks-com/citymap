@@ -1,7 +1,11 @@
 import axios from 'axios';
+
 import {City} from './types';
 
-async function requestWithRetry<T>(request: () => Promise<T>, retries = 3): Promise<T> {
+async function requestWithRetry<T>(
+  request: () => Promise<T>,
+  retries = 3,
+): Promise<T> {
   // Retry the request up to 3 times if it fails waiting a bit between each retry
   try {
     return await request();
@@ -20,7 +24,9 @@ async function requestWithRetry<T>(request: () => Promise<T>, retries = 3): Prom
 async function getTimezone(city: City): Promise<string> {
   // Get local time from WorldTimeAPI
   try {
-    const timeResponse = await axios.get(`https://geo2tz.h4ks.com/tz/${city.lat}/${city.lon}`);
+    const timeResponse = await axios.get(
+      `https://geo2tz.h4ks.com/tz/${city.lat}/${city.lon}`,
+    );
     return timeResponse.data.tz;
   } catch (error) {
     console.error('Error fetching time:', error);
@@ -32,13 +38,16 @@ async function getTemperature(city: City): Promise<number> {
   // Fetch weather data from OpenWeather API
   try {
     // Get current temperature from Open-Meteo API
-    const weatherResponse = await axios.get('https://api.open-meteo.com/v1/forecast', {
-      params: {
-        latitude: city.lat,
-        longitude: city.lon,
-        current_weather: true,
+    const weatherResponse = await axios.get(
+      'https://api.open-meteo.com/v1/forecast',
+      {
+        params: {
+          latitude: city.lat,
+          longitude: city.lon,
+          current_weather: true,
+        },
       },
-    });
+    );
     return weatherResponse.data.current_weather.temperature;
   } catch (error) {
     console.error('Error fetching temperature:', error);
@@ -47,9 +56,9 @@ async function getTemperature(city: City): Promise<number> {
 }
 
 type BatchMap = {
-  timezone: Promise<void>[],
-  temperature: Promise<void>[],
-}
+  timezone: Promise<void>[];
+  temperature: Promise<void>[];
+};
 
 export type CityFields = keyof City;
 
@@ -77,34 +86,45 @@ export async function batchFetchPopulateCityData(
 
   cities.forEach(city => {
     // We don't need to fetch timezone again
-    if (fields.has("timezone") && !city.timezone) {
-      cityDataPromises.timezone.push(getTimezone(city).then(timezone => {
-        city.timezone = timezone;
-      }));
+    if (fields.has('timezone') && !city.timezone) {
+      cityDataPromises.timezone.push(
+        getTimezone(city).then(timezone => {
+          city.timezone = timezone;
+        }),
+      );
     }
     // Always fetch latest temperature
-    if (fields.has("temperature")) {
-      cityDataPromises.temperature.push(getTemperature(city).then(temperature => {
-        city.temperature = temperature;
-      }));
+    if (fields.has('temperature')) {
+      cityDataPromises.temperature.push(
+        getTemperature(city).then(temperature => {
+          city.temperature = temperature;
+        }),
+      );
     }
   });
 
   // Wait for all promises to resolve
-  await Promise.all(cityDataPromises.timezone.concat(cityDataPromises.temperature).map(promise => requestWithRetry(() => promise)));
+  await Promise.all(
+    cityDataPromises.timezone
+      .concat(cityDataPromises.temperature)
+      .map(promise => requestWithRetry(() => promise)),
+  );
   return cities;
 }
 
 export async function geocodeCityName(cityInput: string): Promise<City | null> {
   try {
     // Use Nominatim API for geocoding the city
-    const response = await axios.get(`https://nominatim.openstreetmap.org/search`, {
-      params: {
-        q: cityInput,
-        format: 'json',
-        limit: 1,
+    const response = await axios.get(
+      `https://nominatim.openstreetmap.org/search`,
+      {
+        params: {
+          q: cityInput,
+          format: 'json',
+          limit: 1,
+        },
       },
-    });
+    );
 
     if (response.data.length === 0) {
       return null;
@@ -121,17 +141,23 @@ export async function geocodeCityName(cityInput: string): Promise<City | null> {
   }
 }
 
-export async function reverseGeocodeCity(lat: number, lon: number): Promise<City | null> {
+export async function reverseGeocodeCity(
+  lat: number,
+  lon: number,
+): Promise<City | null> {
   try {
     // Use Nominatim API for reverse geocoding the city
-    const response = await axios.get(`https://nominatim.openstreetmap.org/reverse`, {
-      params: {
-        lat,
-        lon,
-        format: 'json',
-        zoom: 10,
+    const response = await axios.get(
+      `https://nominatim.openstreetmap.org/reverse`,
+      {
+        params: {
+          lat,
+          lon,
+          format: 'json',
+          zoom: 10,
+        },
       },
-    });
+    );
 
     if (!response.data.display_name) {
       return null;

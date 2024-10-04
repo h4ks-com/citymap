@@ -9,7 +9,7 @@ export interface City {
 }
 
 export class CityHelper {
-  city: City
+  city: City;
 
   constructor(city: City) {
     this.city = city;
@@ -17,14 +17,18 @@ export class CityHelper {
 
   id(): string {
     // Returns hash of city coordinates and name
-    return sha256(`${this.city.lat}${this.city.lon}${this.city.name}`).toString();
+    return sha256(
+      `${this.city.lat}${this.city.lon}${this.city.name}`,
+    ).toString();
   }
 
   formatedCurrentTime(): string {
     if (!this.city.timezone) {
       return '00:00:00';
     }
-    return (new Date()).toLocaleString([], {timeZone: this.city.timezone}).split(", ")[1]
+    return new Date()
+      .toLocaleString([], {timeZone: this.city.timezone})
+      .split(', ')[1];
   }
 }
 
@@ -40,5 +44,5 @@ export interface CityManagerProps {
   cities: City[];
   onAddCity?: (city: City) => void;
   onRemoveCity?: (cityName: string) => void;
+  onCityClick?: (city: City) => void;
 }
-

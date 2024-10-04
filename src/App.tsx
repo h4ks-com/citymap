@@ -1,15 +1,13 @@
-import 'maplibre-gl/dist/maplibre-gl.css';
-import Sidebar from './Sidebar';
-import {City} from './types';
-import './App.css';
-import useLocalStorage from './customHooks';
-import FloatingArrowMenu from './layersMenu';
-import appLayers, {LayerType} from './layers';
-import MapContainer from './Map';
-import {batchFetchPopulateCityData, CityFields, cityFieldsFromLayers} from './apis';
-import {useEffect} from 'react';
-import {ThemeProvider, createTheme} from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
+import {ThemeProvider, createTheme} from '@mui/material/styles';
+import 'maplibre-gl/dist/maplibre-gl.css';
+import React from 'react';
+
+import './App.css';
+import {AlertProvider} from './components/AlertContext';
+import {useAlert} from './components/AlertContext';
+import Main from './components/Main';
+import {Storage, getStorageClass} from './storage';
 
 const darkTheme = createTheme({
   palette: {
@@ -23,55 +21,49 @@ const darkTheme = createTheme({
   },
 });
 
+interface ErrorWrapperProps {
+  attempt: number;
+}
+
+const ErrorWrapper: React.FC<ErrorWrapperProps> = ({attempt}) => {
+  const {showAlert} = useAlert();
+  if (attempt > 0) return null;
+
+  // if query param cities is present, use it instead of local storage
+  try {
+    const StorageClass: typeof Storage = getStorageClass();
+    return <Main StorageClass={StorageClass} />;
+  } catch (error) {
+    console.error(error);
+    if (window.location.search.includes('cities')) {
+      showAlert(
+        'Something is wrong with the share URL.\nClick OK to refresh',
+        'Error loading cities from URL',
+        {
+          callback: () => {
+            window.history.pushState({}, '', '/');
+            window.location.reload();
+          },
+          triggerOnOpen: true,
+        },
+      );
+    }
+    return null;
+  }
+};
+
 function App() {
-  const [cities, setCities] = useLocalStorage<City[]>('cities', []);
-  const [enabledLayers, setEnabledLayers] = useLocalStorage<LayerType[]>('layersOn', appLayers.filter(layer => layer.defaultToggled).map(layer => layer.type));
-
-  const updateCityData = async (currentCities: City[]) => {
-    const cityFields: Set<CityFields> = cityFieldsFromLayers(enabledLayers);
-    const updatedCities = await batchFetchPopulateCityData(currentCities, cityFields);
-    setCities([...updatedCities]);
-  };
-
-  const handleAddCity = (newCity: City) => {
-    const newCities = [...cities, newCity];
-    setCities(newCities);
-    updateCityData(newCities);
-  };
-
-  const handleRemoveCity = (cityName: string) => {
-    setCities((prevCities) => prevCities.filter(city => city.name !== cityName));
-  };
-
-  useEffect(() => {
-    updateCityData(cities);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [enabledLayers]);
-
-  // Update temperature every 10 minutes
-  useEffect(() => {
-    const interval = setInterval(() => {
-      updateCityData(cities);
-    }, 10 * 60 * 1000);
-    return () => clearInterval(interval);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
+  const [attempt, setAttempt] = React.useState(0);
   return (
     <ThemeProvider theme={darkTheme}>
-      <CssBaseline />
-      <div className="app">
-        <FloatingArrowMenu layers={appLayers} enabledLayers={enabledLayers} onToggleEvent={(layers) => {
-          setEnabledLayers(layers);
-          updateCityData(cities);
-        }} />
-        <div className="sidebar-container">
-          <Sidebar cities={cities} onAddCity={handleAddCity} onRemoveCity={handleRemoveCity} />
-        </div>
-        <div className="map-container">
-          <MapContainer cities={cities} enabledLayers={enabledLayers} onAddCity={handleAddCity} />
-        </div>
-      </div>
+      <AlertProvider
+        onOpen={() => {
+          setAttempt(attempt + 1);
+        }}
+      >
+        <CssBaseline />
+        <ErrorWrapper attempt={attempt} />
+      </AlertProvider>
     </ThemeProvider>
   );
 }
