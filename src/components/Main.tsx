@@ -57,6 +57,19 @@ const Main: React.FC<AppProps> = ({StorageClass}) => {
     setCities([...updatedCities]);
   };
 
+  const flyToCity = (city: City) => {
+    map?.current?.flyTo({
+      center: [city.lon, city.lat],
+      zoom: 10,
+      speed: 3,
+      curve: 2,
+      easing(t) {
+        return t;
+      },
+      essential: true,
+    });
+  };
+
   const handleAddCity = (newCity: City) => {
     // if mobile, we collapse the sidebar
     if (!isHighWidth) {
@@ -71,22 +84,15 @@ const Main: React.FC<AppProps> = ({StorageClass}) => {
     const newCities = [...cities, newCity];
     setCities(newCities);
     updateCityData(newCities);
+
+    // if mobile, we fly to the city
+    if (!isHighWidth) {
+      flyToCity(newCity);
+    }
   };
 
   const handleRemoveCity = (cityName: string) => {
     setCities(prevCities => prevCities.filter(city => city.name !== cityName));
-  };
-  const flyToCity = (city: City) => {
-    map?.current?.flyTo({
-      center: [city.lon, city.lat],
-      zoom: 10,
-      speed: 3,
-      curve: 2,
-      easing(t) {
-        return t;
-      },
-      essential: true,
-    });
   };
 
   useEffect(() => {
