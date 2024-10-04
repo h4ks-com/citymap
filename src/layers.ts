@@ -3,11 +3,22 @@ import {CircleLayer, SymbolLayer} from 'react-map-gl/dist/esm/exports-maplibre';
 
 import {FloatingMenuLayer} from './types';
 
-export type LayerType = 'dots' | 'names' | 'time' | 'temperature';
+export type LayerType =
+  | 'dots'
+  | 'names'
+  | 'time'
+  | 'temperature'
+  | 'satellite'
+  | 'default';
 
 export interface AppLayer extends FloatingMenuLayer {
   type: LayerType;
   spec: LayerSpecification;
+}
+
+export interface AppMapStyle extends FloatingMenuLayer {
+  type: LayerType;
+  style: string;
 }
 
 const dotsStyle: CircleLayer = {
@@ -138,4 +149,25 @@ const appSources: AppLayer[] = [
   },
 ];
 
+const appMapStyles: AppMapStyle[] = [
+  {
+    type: 'default',
+    name: 'Default',
+    description: 'Default map view',
+    defaultToggled: true,
+    toggleable: true,
+    style: `${process.env.PUBLIC_URL}/style.json`,
+  },
+  {
+    type: 'satellite',
+    name: 'Satellite',
+    description: 'Satellite imagery view',
+    defaultToggled: false,
+    toggleable: true,
+    style:
+      'https://api.maptiler.com/maps/hybrid/style.json?key=OVCTzuFLwqkHSOwHpV5x',
+  },
+];
+
 export default appSources;
+export {appMapStyles};

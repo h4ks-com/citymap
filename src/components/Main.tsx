@@ -8,7 +8,7 @@ import {
   batchFetchPopulateCityData,
   cityFieldsFromLayers,
 } from '../apis';
-import appSources, {LayerType} from '../layers';
+import appSources, {LayerType, appMapStyles} from '../layers';
 import {LocalStorage, Storage, useStorage} from '../storage';
 import {City, CityHelper} from '../types';
 import MapContainer from './Map';
@@ -31,7 +31,14 @@ const Main: React.FC<AppProps> = ({StorageClass}) => {
   const [enabledLayers, setEnabledLayers] = useStorage<LayerType[]>(
     LocalStorage,
     'layersOn',
-    appSources.filter(layer => layer.defaultToggled).map(layer => layer.type),
+    appSources
+      .filter(layer => layer.defaultToggled)
+      .map(layer => layer.type)
+      .concat(
+        appMapStyles
+          .filter(layer => layer.defaultToggled)
+          .map(layer => layer.type),
+      ),
   );
   const [flyLoopState, setFlyLoopState] = useState<FlyLoopState>({
     index: 0,
@@ -139,7 +146,8 @@ const Main: React.FC<AppProps> = ({StorageClass}) => {
       <div style={{zIndex: 1000}}>
         <FloatingArrowMenu
           cities={cities}
-          layers={appSources}
+          sources={appSources}
+          styles={appMapStyles}
           enabledLayers={enabledLayers}
           onToggleEvent={layers => {
             setEnabledLayers(layers);

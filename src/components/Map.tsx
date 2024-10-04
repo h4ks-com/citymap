@@ -6,7 +6,7 @@ import React, {useEffect, useRef, useState} from 'react';
 import Map, {Layer, Source} from 'react-map-gl/maplibre';
 
 import {CityFields, cityFieldsFromLayers, reverseGeocodeCity} from '../apis';
-import appSources, {LayerType} from '../layers';
+import appSources, {LayerType, appMapStyles} from '../layers';
 import {City, CityHelper, CityManagerProps} from '../types';
 import {useAlert} from './AlertContext';
 
@@ -68,8 +68,6 @@ const MapContainer: React.FC<MapComponentProps> = ({
   const {showAlert} = useAlert();
   const map = useRef<maplibregl.Map>();
 
-  const layers = appSources.filter(layer => enabledLayers.includes(layer.type));
-
   useEffect(() => {
     setGeojson(createGeoJSONData(cities, cityFields));
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -102,7 +100,11 @@ const MapContainer: React.FC<MapComponentProps> = ({
         map.current = e.target as unknown as maplibregl.Map;
         onMapLoad?.(map.current);
       }}
-      mapStyle={`${process.env.PUBLIC_URL}/style.json`}
+      mapStyle={
+        appMapStyles
+          .filter(style => enabledLayers.includes(style.type))
+          .concat(appMapStyles)[0].style
+      }
       onContextMenu={async event => {
         event.preventDefault();
         const {lng, lat} = event.lngLat;
@@ -147,19 +149,21 @@ const MapContainer: React.FC<MapComponentProps> = ({
       }}
       interactiveLayerIds={['point']}
     >
-      {layers.map(layer => {
-        return (
-          <Source
-            id={layer.type}
-            type='geojson'
-            data={geojson}
-            key={layer.type}
-            promoteId='identifier'
-          >
-            <Layer {...layer.spec} />
-          </Source>
-        );
-      })}
+      {appSources
+        .filter(layer => enabledLayers.includes(layer.type))
+        .map(layer => {
+          return (
+            <Source
+              id={layer.type}
+              type='geojson'
+              data={geojson}
+              key={layer.type}
+              promoteId='identifier'
+            >
+              <Layer {...layer.spec} />
+            </Source>
+          );
+        })}
     </Map>
   );
 };
