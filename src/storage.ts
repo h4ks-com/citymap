@@ -50,7 +50,7 @@ class URLStorage extends Storage {
 
   setItem(key: string, value: any): void {
     const newUrl = new URL(window.location.href);
-    newUrl.searchParams.set(key, objectToQueryString(value));
+    newUrl.searchParams.set(key, JSONCrush.crush(JSON.stringify(value)));
     window.history.pushState({}, '', newUrl.toString());
   }
 }
