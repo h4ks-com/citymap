@@ -18,7 +18,7 @@ const FloatingArrowSidebar: React.FC<FabProps> = ({
     <IconButton
       onClick={toggleSidebar}
       sx={{
-        position: 'absolute',
+        position: 'fixed',
         top: 16,
         left: isCollapsed ? '16px' : '25vw',
         backgroundColor: 'primary.main',

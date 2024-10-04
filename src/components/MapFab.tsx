@@ -17,6 +17,7 @@ import {
 } from '@mui/material';
 import React, {useState} from 'react';
 import {CopyToClipboard} from 'react-copy-to-clipboard';
+import {shareOnMobile} from 'react-mobile-share';
 
 import appSources, {LayerType} from '../layers';
 import {objectToQueryString} from '../storage';
@@ -106,6 +107,11 @@ const FloatingArrowMenu: React.FC<LayerMenuProps> = ({
   const handleCopy = () => {
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+    shareOnMobile({
+      title: 'City Map',
+      text: 'Share the current cities into a temporary map',
+      url: generateShareableUrl(),
+    });
   };
 
   return (
@@ -117,6 +123,8 @@ const FloatingArrowMenu: React.FC<LayerMenuProps> = ({
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
+        overflow: 'scroll',
+        scrollBehavior: 'smooth',
       }}
     >
       <IconButton
@@ -133,7 +141,13 @@ const FloatingArrowMenu: React.FC<LayerMenuProps> = ({
         {open ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />}
       </IconButton>
 
-      <Collapse in={open} orientation='vertical' sx={{mt: 1}}>
+      <Collapse
+        in={open}
+        orientation='vertical'
+        sx={{
+          mt: 1,
+        }}
+      >
         <Paper
           elevation={3}
           sx={{
@@ -142,6 +156,7 @@ const FloatingArrowMenu: React.FC<LayerMenuProps> = ({
             flexDirection: 'column',
             backgroundColor: 'background.paper',
           }}
+          style={{maxHeight: '70vh', overflow: 'scroll'}}
         >
           {sources
             .filter(layer => layer.toggleable)
