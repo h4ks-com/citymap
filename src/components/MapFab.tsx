@@ -18,7 +18,6 @@ import {LayerType} from '../layers';
 import {objectToQueryString} from '../storage';
 import {City, FloatingMenuLayer} from '../types';
 
-// Example layers array
 interface LayerMenuProps {
   layers: FloatingMenuLayer[];
   enabledLayers: string[];
@@ -36,8 +35,8 @@ const FloatingArrowMenu: React.FC<LayerMenuProps> = ({
 }) => {
   const [open, setOpen] = useState<boolean>(false);
   const [flyLooping, setFlyLooping] = useState<boolean>(false);
+  const [copied, setCopied] = useState<boolean>(false);
 
-  // Initialize state with all switches
   const [switchStates, setSwitchStates] = useState<{[key: string]: boolean}>(
     layers.reduce(
       (acc, layer) => {
@@ -48,7 +47,6 @@ const FloatingArrowMenu: React.FC<LayerMenuProps> = ({
     ),
   );
 
-  // Handle switch changes
   const handleSwitchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newSwitchState = {
       ...switchStates,
@@ -56,7 +54,6 @@ const FloatingArrowMenu: React.FC<LayerMenuProps> = ({
     };
     setSwitchStates(newSwitchState);
 
-    // Update enabled layers, prevent duplicates
     const enabledLayers = Object.entries(newSwitchState)
       .filter(([, enabled]) => enabled)
       .map(([name]) => name);
@@ -64,8 +61,13 @@ const FloatingArrowMenu: React.FC<LayerMenuProps> = ({
   };
 
   const generateShareableUrl = () => {
-    const currentUrl = window.location.href.split('?')[0]; // Get current URL without query parameters
+    const currentUrl = window.location.href.split('?')[0];
     return `${currentUrl}?cities=${objectToQueryString(cities)}`;
+  };
+
+  const handleCopy = () => {
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   return (
@@ -75,11 +77,10 @@ const FloatingArrowMenu: React.FC<LayerMenuProps> = ({
         top: 16,
         right: '16px',
         display: 'flex',
-        flexDirection: 'column', // Align button and dropdown vertically
+        flexDirection: 'column',
         alignItems: 'center',
       }}
     >
-      {/* Arrow Button */}
       <IconButton
         onClick={() => setOpen(!open)}
         sx={{
@@ -94,14 +95,13 @@ const FloatingArrowMenu: React.FC<LayerMenuProps> = ({
         {open ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />}
       </IconButton>
 
-      {/* Dropdown Menu */}
       <Collapse in={open} orientation='vertical' sx={{mt: 1}}>
         <Paper
           elevation={3}
           sx={{
             padding: '8px',
             display: 'flex',
-            flexDirection: 'column', // Arrange switches vertically
+            flexDirection: 'column',
             backgroundColor: 'background.paper',
           }}
         >
@@ -159,16 +159,19 @@ const FloatingArrowMenu: React.FC<LayerMenuProps> = ({
             </Tooltip>
           </Box>
 
-          {/* Share Button */}
-          <CopyToClipboard text={generateShareableUrl()}>
+          {/* Share Button with Copy Feedback */}
+          <CopyToClipboard text={generateShareableUrl()} onCopy={handleCopy}>
             <Button
               variant='contained'
-              color='primary'
+              color={copied ? 'success' : 'primary'}
               startIcon={<ShareIcon />}
               fullWidth
-              sx={{mt: 2}}
+              sx={{
+                mt: 2,
+                transition: 'background-color 0.3s ease',
+              }}
             >
-              Share
+              {copied ? 'Copied!' : 'Share'}
             </Button>
           </CopyToClipboard>
         </Paper>

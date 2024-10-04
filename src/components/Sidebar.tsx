@@ -1,5 +1,6 @@
 import ClearIcon from '@mui/icons-material/Clear';
 import DeleteIcon from '@mui/icons-material/Delete';
+import MenuOpenSharpIcon from '@mui/icons-material/MenuOpenSharp';
 import {
   Box,
   Button,
@@ -10,6 +11,7 @@ import {
   ListItemText,
   Paper,
   TextField,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import React, {useState} from 'react';
@@ -20,7 +22,7 @@ import {useAlert} from './AlertContext';
 
 interface SidebarProps extends CityManagerProps {
   isSidebarCollapsed: boolean;
-  setIsSidebarCollapsed: (isCollapsed: boolean) => void;
+  onCollapseClicked: () => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
@@ -28,6 +30,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   onAddCity,
   onRemoveCity,
   onCityClick,
+  onCollapseClicked,
 }) => {
   const [cityInput, setCityInput] = useState('');
   const {showAlert} = useAlert();
@@ -91,9 +94,29 @@ const Sidebar: React.FC<SidebarProps> = ({
         backgroundColor: 'background.paper',
       }}
     >
-      <Typography variant='h6' gutterBottom>
-        Cities
-      </Typography>
+      {/* Collapse button on the top right */}
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}
+      >
+        <Typography variant='h6' gutterBottom>
+          Cities
+        </Typography>
+        <Tooltip
+          title='Collapse Sidebar'
+          arrow
+          sx={{mb: 2}}
+          PopperProps={{style: {zIndex: 10000}}}
+        >
+          <IconButton onClick={onCollapseClicked} aria-label='collapse sidebar'>
+            <MenuOpenSharpIcon />
+          </IconButton>
+        </Tooltip>
+      </Box>
+
       <Typography variant='body1'>Add a city to the map:</Typography>
 
       {/* City Input Field */}
@@ -160,8 +183,17 @@ const Sidebar: React.FC<SidebarProps> = ({
             <ListItemText
               primary={
                 <Box
-                  onClick={() => onCityClick?.(city)} // Handle city click event
-                  sx={{cursor: 'pointer'}} // Show pointer cursor on hover
+                  onClick={() => onCityClick?.(city)}
+                  sx={{
+                    cursor: 'pointer',
+                    padding: '4px 8px',
+                    borderRadius: '4px',
+                    transition: 'background-color 0.3s ease, color 0.3s ease',
+                    '&:hover': {
+                      backgroundColor: 'action.hover',
+                      color: 'white',
+                    },
+                  }}
                 >
                   {highlightText(city.name, cityInput)}
                 </Box>

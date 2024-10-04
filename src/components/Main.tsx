@@ -167,7 +167,7 @@ const Main: React.FC<AppProps> = ({StorageClass}) => {
             setIsSidebarCollapsed(!isSidebarCollapsed);
           }}
           sx={{
-            left: isSidebarCollapsed ? '16px' : isHighWidth ? '18vw' : '85vw',
+            left: isSidebarCollapsed ? '16px' : '-30vw',
             top: '24px',
           }}
         />
@@ -201,7 +201,9 @@ const Main: React.FC<AppProps> = ({StorageClass}) => {
             flyToCity(city);
           }}
           isSidebarCollapsed={isSidebarCollapsed}
-          setIsSidebarCollapsed={setIsSidebarCollapsed}
+          onCollapseClicked={() => {
+            setIsSidebarCollapsed(true);
+          }}
         />
       </Collapse>
       <div className='map-container' style={{zIndex: 0}}>
