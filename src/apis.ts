@@ -120,7 +120,7 @@ export async function geocodeCityName(cityInput: string): Promise<City | null> {
       {
         params: {
           q: cityInput,
-          featuretype: 'city',
+          zoom: 10,
           format: 'json',
           limit: 1,
         },
