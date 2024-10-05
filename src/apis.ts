@@ -114,12 +114,13 @@ export async function batchFetchPopulateCityData(
 
 export async function geocodeCityName(cityInput: string): Promise<City | null> {
   try {
-    // Use Nominatim API for geocoding the city
+    // Use Nominatim API for geocoding the city, cities only
     const response = await axios.get(
       `https://nominatim.openstreetmap.org/search`,
       {
         params: {
           q: cityInput,
+          featuretype: 'city',
           format: 'json',
           limit: 1,
         },
