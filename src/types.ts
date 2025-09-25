@@ -43,6 +43,6 @@ export interface FloatingMenuLayer {
 export interface CityManagerProps {
   cities: City[];
   onAddCity?: (city: City) => void;
-  onRemoveCity?: (cityName: string) => void;
+  onRemoveCity?: (cityId: string) => void;
   onCityClick?: (city: City) => void;
 }

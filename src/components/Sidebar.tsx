@@ -18,16 +18,19 @@ import React, {useState} from 'react';
 
 import {geocodeCityName} from '../apis';
 import {CityManagerProps} from '../types';
+import {CityHelper} from '../types';
 import {useAlert} from './AlertContext';
 
 interface SidebarProps extends CityManagerProps {
   isSidebarCollapsed: boolean;
   onCollapseClicked: () => void;
+  onSearchCity?: (cityInput: string) => Promise<any>;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
   cities,
   onAddCity,
+  onSearchCity,
   onRemoveCity,
   onCityClick,
   onCollapseClicked,
@@ -37,12 +40,29 @@ const Sidebar: React.FC<SidebarProps> = ({
 
   const handleAddCity = async () => {
     if (!cityInput) return;
-    const newCity = await geocodeCityName(cityInput);
-    if (newCity) {
-      setCityInput('');
-      onAddCity?.(newCity);
-    } else {
-      showAlert('City not found!');
+
+    try {
+      // Use the new search function if available (which opens dialog)
+      if (onSearchCity) {
+        const result = await onSearchCity(cityInput);
+        if (result === true) {
+          // Dialog will handle selection, clear input
+          setCityInput('');
+        } else if (result === null) {
+          showAlert('City not found!');
+        }
+      } else {
+        // Fallback to old behavior
+        const newCity = await geocodeCityName(cityInput);
+        if (newCity) {
+          setCityInput('');
+          onAddCity?.(newCity);
+        } else {
+          showAlert('City not found!');
+        }
+      }
+    } catch (error) {
+      showAlert('Error searching for city!');
     }
   };
 
@@ -166,14 +186,14 @@ const Sidebar: React.FC<SidebarProps> = ({
             )}
           </ListItem>
         )}
-        {displayCities.map((city, index) => (
+        {displayCities.map(city => (
           <ListItem
-            key={index}
+            key={new CityHelper(city).id()}
             secondaryAction={
               <IconButton
                 edge='end'
                 aria-label='delete'
-                onClick={() => onRemoveCity?.(city.name)}
+                onClick={() => onRemoveCity?.(new CityHelper(city).id())}
               >
                 <DeleteIcon />
               </IconButton>

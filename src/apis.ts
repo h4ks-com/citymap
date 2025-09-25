@@ -112,6 +112,11 @@ export async function batchFetchPopulateCityData(
   return cities;
 }
 
+export interface CityOption extends City {
+  displayName: string;
+  country: string;
+}
+
 export async function geocodeCityName(cityInput: string): Promise<City | null> {
   try {
     // Use Nominatim API for geocoding the city
@@ -135,6 +140,49 @@ export async function geocodeCityName(cityInput: string): Promise<City | null> {
       lat: parseFloat(cityData.lat),
       lon: parseFloat(cityData.lon),
     };
+  } catch (error) {
+    console.error('Error fetching city data', error);
+    throw error;
+  }
+}
+
+export async function geocodeCityOptions(
+  cityInput: string,
+): Promise<CityOption[]> {
+  try {
+    // Use Nominatim API for geocoding the city with multiple results
+    const response = await axios.get(
+      `https://nominatim.openstreetmap.org/search`,
+      {
+        params: {
+          q: cityInput,
+          format: 'json',
+          limit: 5, // Get up to 5 results for selection
+          addressdetails: 1, // Get address details for country info
+        },
+      },
+    );
+
+    if (response.data.length === 0) {
+      return [];
+    }
+
+    return response.data.map((cityData: any) => {
+      const displayNameParts = cityData.display_name.split(',');
+      const cityName = displayNameParts[0];
+      const country =
+        cityData.address?.country ||
+        displayNameParts[displayNameParts.length - 1]?.trim() ||
+        'Unknown';
+
+      return {
+        name: cityName,
+        lat: parseFloat(cityData.lat),
+        lon: parseFloat(cityData.lon),
+        displayName: cityData.display_name,
+        country: country,
+      };
+    });
   } catch (error) {
     console.error('Error fetching city data', error);
     throw error;

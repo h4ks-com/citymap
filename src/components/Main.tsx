@@ -5,12 +5,15 @@ import React from 'react';
 
 import {
   CityFields,
+  CityOption,
   batchFetchPopulateCityData,
   cityFieldsFromLayers,
+  geocodeCityOptions,
 } from '../apis';
 import appSources, {LayerType, appMapStyles} from '../layers';
 import {LocalStorage, Storage, useStorage} from '../storage';
 import {City, CityHelper} from '../types';
+import CitySelectionDialog from './CitySelectionDialog';
 import MapContainer from './Map';
 import FloatingArrowMenu from './MapFab';
 import Sidebar from './Sidebar';
@@ -44,6 +47,15 @@ const Main: React.FC<AppProps> = ({StorageClass}) => {
     index: 0,
     isLooping: false,
   });
+  const [cityDialogState, setCityDialogState] = useState<{
+    isOpen: boolean;
+    cities: CityOption[];
+    searchTerm: string;
+  }>({
+    isOpen: false,
+    cities: [],
+    searchTerm: '',
+  });
   const isHighWidth = useMediaQuery('(min-width:600px)');
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(!isHighWidth);
   const map = useRef<maplibregl.Map>();
@@ -70,6 +82,42 @@ const Main: React.FC<AppProps> = ({StorageClass}) => {
     });
   };
 
+  const handleSearchCity = async (cityInput: string) => {
+    try {
+      const cityOptions = await geocodeCityOptions(cityInput);
+      if (cityOptions.length === 0) {
+        return null; // Let Sidebar handle the "not found" case
+      }
+
+      setCityDialogState({
+        isOpen: true,
+        cities: cityOptions,
+        searchTerm: cityInput,
+      });
+
+      return true; // Indicate that dialog will handle selection
+    } catch (error) {
+      throw error; // Let Sidebar handle the error
+    }
+  };
+
+  const handleCityDialogSelect = (selectedCity: City) => {
+    setCityDialogState({
+      isOpen: false,
+      cities: [],
+      searchTerm: '',
+    });
+    handleAddCity(selectedCity);
+  };
+
+  const handleCityDialogCancel = () => {
+    setCityDialogState({
+      isOpen: false,
+      cities: [],
+      searchTerm: '',
+    });
+  };
+
   const handleAddCity = (newCity: City) => {
     // if mobile, we collapse the sidebar
     if (!isHighWidth) {
@@ -91,8 +139,10 @@ const Main: React.FC<AppProps> = ({StorageClass}) => {
     }
   };
 
-  const handleRemoveCity = (cityName: string) => {
-    setCities(prevCities => prevCities.filter(city => city.name !== cityName));
+  const handleRemoveCity = (cityId: string) => {
+    setCities(prevCities =>
+      prevCities.filter(city => new CityHelper(city).id() !== cityId),
+    );
   };
 
   useEffect(() => {
@@ -213,6 +263,7 @@ const Main: React.FC<AppProps> = ({StorageClass}) => {
         <Sidebar
           cities={cities}
           onAddCity={handleAddCity}
+          onSearchCity={handleSearchCity}
           onRemoveCity={handleRemoveCity}
           onCityClick={city => {
             // if mobile, we collapse the sidebar
@@ -240,6 +291,13 @@ const Main: React.FC<AppProps> = ({StorageClass}) => {
           fullWidth={isSidebarCollapsed}
         />
       </div>
+      <CitySelectionDialog
+        open={cityDialogState.isOpen}
+        cities={cityDialogState.cities}
+        searchTerm={cityDialogState.searchTerm}
+        onSelect={handleCityDialogSelect}
+        onCancel={handleCityDialogCancel}
+      />
     </div>
   );
 };
