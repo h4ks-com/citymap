@@ -152,6 +152,8 @@ const Main: React.FC<AppProps> = ({StorageClass}) => {
 
   // Update temperature every 10 minutes
   useEffect(() => {
+    if (cities.length === 0) return;
+
     const interval = setInterval(
       () => {
         updateCityData(cities);
@@ -159,8 +161,7 @@ const Main: React.FC<AppProps> = ({StorageClass}) => {
       10 * 60 * 1000,
     );
     return () => clearInterval(interval);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [cities]);
 
   // Collapse sidebar on small screens
   useEffect(() => {
